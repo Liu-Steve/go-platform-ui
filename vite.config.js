@@ -17,6 +17,16 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  server: {
+    host: '0.0.0.0',
+    port: '8081',
+    proxy: {
+      '/api': {
+        target: 'https://dragondj.space',
+        changeOrigin: true
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

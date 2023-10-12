@@ -1,7 +1,11 @@
+<script setup>
+import background from '../assets/test.jpg'
+</script>
+
 <template>
     <div style="whdth: 100vw;height:100vh;overflow:hidden;display: flex;">
         <div style="flex:1;background-color: #6cf;">
-            <el-image style="width: 100%;height: 100%;" fit="cover" src="./src/assets/test.jpg" />
+            <el-image style="width: 100%;height: 100%;" fit="cover" :src="background" />
         </div>
 
         <div class="welcome-title">
@@ -14,10 +18,6 @@
         </div>
     </div>
 </template>
-
-<script setup>
-
-</script>
 
 <style scoped>
 .welcome-title {

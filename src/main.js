@@ -9,7 +9,7 @@ import axios from 'axios'
 
 const app = createApp(App)
 
-axios.defaults.baseURL = 'https://dragondj.space'
+// axios.defaults.baseURL = 'https://dragondj.space/api'
 
 app.use(createPinia())
 app.use(router)

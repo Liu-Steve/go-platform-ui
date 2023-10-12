@@ -36,7 +36,7 @@
             <span style="color:grey;font-size: 13px;">没有账号</span>
         </el-divider>
         <div>
-            <el-button style="width: 270px;" type="warning" plain>注册账号</el-button>
+            <el-button @click="test" style="width: 270px;" type="warning" plain>注册账号</el-button>
         </div>
     </div>
 </template>
@@ -44,7 +44,7 @@
 <script setup>
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive } from "vue";
-import { post } from '../../net';
+import { get, post } from '../../net';
 
 const form = reactive({
     "id": 0,
@@ -78,6 +78,12 @@ const login = () => {
         }
         )
     }
+}
+
+const test = () => {
+    get('/api/hello/200', (data) => {
+        ElMessage.success(data)
+    })
 }
 </script>
 

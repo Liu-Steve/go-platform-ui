@@ -21,16 +21,26 @@ function post(url, data, success, failure = defaultFailure, error = defaultError
 }
 
 function get(url, success, failure = defaultFailure, error = defaultError) {
-    axios.get(url, {
-        withCredentials: true,
-    }).then(({ data }) => {
-        if (data.success) {
-            success(data.message, data.status)
+    axios.get(url)
+    .then((response) => {
+        // 状态代码 2xx
+        success(response.data, response.status)
+    }).catch((err) => {
+        if (err.response) {
+            // 状态代码超出 2xx
+            failure(`请求错误，错误代码：${err.response.status}`)
+            console.error(err.response)
+        }
+        else if (err.request) {
+            failure('请求超时')
+            console.error(err.request)
         }
         else {
-            failure(data.message, data.status)
+            error()
+            console.error(err.message)
         }
-    }).catch(error)
+        console.log(err.config)
+    })
 }
 
 export { get, post }
