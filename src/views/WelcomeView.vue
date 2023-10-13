@@ -13,10 +13,12 @@ import background from '../assets/test.jpg'
             <div style="margin-top: 20px;"></div>
         </div>
 
-        <div style="width:400px;background-color: white;">
-            <transition name="el-fade-in-linear">
-                <router-view />
-            </transition>
+        <div style="width:400px;background-color: white;z-index: 1;">
+            <router-view v-slot="{ Component }">
+                <transition name="el-fade-in-linear" mode="out-in">
+                    <component :is="Component" />
+                </transition>
+            </router-view>
         </div>
     </div>
 </template>
