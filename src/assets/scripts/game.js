@@ -146,3 +146,5 @@ class Game {
     }
 
 }
+
+export { Game }

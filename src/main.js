@@ -5,7 +5,8 @@ import App from './App.vue'
 import router from './router'
 
 import 'element-plus/dist/index.css'
-import axios from 'axios'
+import './assets/css/animation.css'
+import './assets/css/index.css'
 
 const app = createApp(App)
 

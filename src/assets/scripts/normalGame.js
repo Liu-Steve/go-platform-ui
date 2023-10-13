@@ -1,6 +1,8 @@
 /**
  * 方格子的围棋
  */
+import { Game } from "./game.js"
+
 class NormalGame extends Game {
 
     /**
@@ -11,6 +13,8 @@ class NormalGame extends Game {
      */
     constructor(ele) {
         super();
+
+
 
         this.bindTableEle = ele.querySelector(".table");
         this._initBoard();
@@ -431,7 +435,7 @@ class NormalGame extends Game {
                     }
                 }
 
-                bgEle.style.backgroundImage = `url("img/${name}.png")`;
+                bgEle.style.backgroundImage = `url("../img/${name}.png")`;
                 bgEle.style.backgroundSize = `contain`;
                 tableBox.appendChild(bgEle);
 

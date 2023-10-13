@@ -1,5 +1,8 @@
 window.onload = function () {
 
+    console.log(11111)
+
+
     // 围棋棋盘
     let gameDiv = $(".normalGameDiv");
     let game = new NormalGame(gameDiv);

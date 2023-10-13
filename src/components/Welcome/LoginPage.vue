@@ -30,13 +30,14 @@
             </el-col>
         </el-row>
         <div style="margin-top: 40px;">
-            <el-button @click="login" style="width: 270px;" type="success" plain>立即登录</el-button>
+            <!-- todo 加上登录验证 -->
+            <el-button @click="$router.push('/index')" style="width: 270px;" type="success" plain>立即登录</el-button>
         </div>
         <el-divider>
             <span style="color:grey;font-size: 13px;">没有账号</span>
         </el-divider>
         <div>
-            <el-button @click= "$router.push('register')" style="width: 270px;" type="warning" plain>
+            <el-button @click="$router.push('register')" style="width: 270px;" type="warning" plain>
                 注册账号
             </el-button>
         </div>
@@ -80,12 +81,6 @@ const login = () => {
         }
         )
     }
-}
-
-const test = () => {
-    get('/api/hello/200', (data) => {
-        ElMessage.success(data)
-    })
 }
 </script>
 
