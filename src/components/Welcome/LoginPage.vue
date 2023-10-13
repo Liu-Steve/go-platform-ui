@@ -36,7 +36,9 @@
             <span style="color:grey;font-size: 13px;">没有账号</span>
         </el-divider>
         <div>
-            <el-button @click="test" style="width: 270px;" type="warning" plain>注册账号</el-button>
+            <el-button @click= "$router.push('register')" style="width: 270px;" type="warning" plain>
+                注册账号
+            </el-button>
         </div>
     </div>
 </template>
@@ -72,7 +74,7 @@ const login = () => {
             "status": form.status,
             "createdDate": form.createdDate,
             "updatedDate": form.updatedDate,
-        }, (messge) => {
+        }, (message) => {
             ElMessage.success(message)
             router.push('/index')
         }
