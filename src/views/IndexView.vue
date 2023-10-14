@@ -7,7 +7,7 @@
             <!-- todo:退出登录 -->
             <el-button @click="$router.push('/')" type="danger" plain>退出登录</el-button>
 
-            <el-button @click="$router.push('/chess')" type="success" plain>开始下棋</el-button>
+            <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button>
         </div>
     </div>
 </template>

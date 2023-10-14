@@ -27,10 +27,10 @@ const router = createRouter({
       component: () => import('@/views/IndexView.vue')
     },
     {
-      path: '/chess',
-      name: 'chess',
-      component: () => import('@/views/ChessView.vue')
-    }
+      path: '/game',
+      name: 'game',
+      component: () => import("@/views/ShudanView.vue")
+    },
   ]
 })
 
