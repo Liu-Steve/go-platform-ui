@@ -5,7 +5,7 @@
         </div>
         <div>
             <!-- todo:退出登录 -->
-            <el-button @click="$router.push('/')" type="danger" plain>退出登录</el-button>
+            <el-button @click="logout" type="danger" plain>退出登录</el-button>
 
             <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button>
         </div>
@@ -14,12 +14,16 @@
 
 <script setup>
 import { ElMessage } from 'element-plus';
+import axios from "axios";
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 const logout = () => {
-    get('/user/logout', () => {
-        ElMessage.success(message)
-        router.push('/')
-    })
+    localStorage.removeItem('Authorization')
+    axios.defaults.headers.common['Authorization'] = null
+    ElMessage.success('已退出登录')
+    router.push('/')
 }
 
 </script>

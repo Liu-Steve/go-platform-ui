@@ -30,8 +30,7 @@
             </el-col>
         </el-row>
         <div style="margin-top: 40px;">
-            <!-- todo 加上登录验证 -->
-            <el-button @click="$router.push('/index')" style="width: 270px;" type="success" plain>立即登录</el-button>
+            <el-button @click="login" style="width: 270px;" type="success" plain>立即登录</el-button>
         </div>
         <el-divider>
             <span style="color:grey;font-size: 13px;">没有账号</span>
@@ -48,17 +47,15 @@
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive } from "vue";
 import { get, post } from '../../net';
+import { useRouter } from 'vue-router'
+import axios from "axios";
+
+const router = useRouter();
 
 const form = reactive({
-    "id": 0,
     "username": "",
     "password": "",
-    "email": "string",
     "remembered": false,
-    "salt": 0,
-    "status": 0,
-    "createdDate": "2023-10-12T10:07:45.113Z",
-    "updatedDate": "2023-10-12T10:07:45.113Z",
 })
 
 const login = () => {
@@ -66,17 +63,15 @@ const login = () => {
         ElMessage.warning('请填写用户名和密码')
     }
     else {
-        post('/user/login', {
-            "id": form.id,
-            "username": form.username,
+        post('/api/user/login', {
+            "feature": form.username,
             "password": form.password,
-            "email": form.email,
-            "salt": form.salt,
-            "status": form.status,
-            "createdDate": form.createdDate,
-            "updatedDate": form.updatedDate,
         }, (message) => {
-            ElMessage.success(message)
+            ElMessage.success('登陆成功!')
+            if (form.remembered) {
+                localStorage.setItem('Authorization', message.token);   // 持久化
+            }
+            axios.defaults.headers.common['Authorization'] = `Bearer ${message.token}`;
             router.push('/index')
         }
         )
