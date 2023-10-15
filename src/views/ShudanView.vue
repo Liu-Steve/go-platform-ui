@@ -1,44 +1,51 @@
 <template>
-    <div style="display: grid; grid-template-columns: 15em auto; column-gap: 1em;">
-        <form style="display: flex; flex-direction: column;">
-            <p style="margin: 0px 0px 0.5em;">
-                Size:
-                <button type="button" @click="maxSize = Math.max(maxSize - 20, 200)" v-text="'-'" />
-                <button type="button" title="Reset" @click="maxSize = 480" v-text="'•'" />
-                <button type="button" @click="maxSize += 20" v-text="'+'" />
-            </p>
-            <p style="margin: 0px 0px 0.5em;">
-                Stones:
-                <button type="button" title="Reset" @click="signMap = JSON.parse(JSON.stringify(rawSignMap))"
-                    v-text="'•'" />
-            </p>
-            <div>
-                <template v-for="(c, i) in checkBoxs">
-                    <label style="display: flex; align-items: center;">
-                        <input type="checkbox" style="marginRight: .5em;" :value="c.stateKey" v-model="checkedNames">
-                        <span style="user-select: none;" v-text="c.text" />
-                    </label>
-                </template>
-            </div>
-        </form>
+    <div style="display: flex;;">
+        <div style="flex:1 width: 100vh; height: 100vh; float:left">
+            <Goban :max-width="maxSize" :max-height="maxSize" :animate="true" :busy="isBusy"
+                :range-x="showCorner ? [8, 18] : undefined" :range-y="showCorner ? [12, 18] : undefined"
+                :coord-x="alternateCoordinates ? chineseCoordx : undefined"
+                :coord-y="alternateCoordinates ? chineseCoordy : undefined" :sign-map="signMap"
+                :show-coordinates="showCoordinates" :fuzzy-stone-placement="fuzzyStonePlacement"
+                :animate-stone-placement="animateStonePlacement" :paint-map="showPaintMap ? paintMap : undefined"
+                :heat-map="showHeatMap ? heatMap : undefined" :marker-map="showMarkerMap ? markerMap : undefined"
+                :ghost-stone-map="showGhostStones ? ghostStoneMap : undefined" :lines="showLines ? [
+                    { type: 'line', v1: [15, 6], v2: [12, 15] },
+                    { type: 'arrow', v1: [10, 4], v2: [5, 7] }
+                ] : []" :dimmed-map="showDimmedStones ? dimmedMap : []"
+                :selected-map="showSelection ? selectedMap : []" @click="onVertexClick" />
+        </div>
 
-        <Goban :boardSize="19" :max-width="maxSize" :max-height="maxSize" :animate="true" :busy="isBusy"
-            :range-x="showCorner ? [8, 18] : undefined" :range-y="showCorner ? [12, 18] : undefined"
-            :coord-x="alternateCoordinates ? chineseCoordx : undefined"
-            :coord-y="alternateCoordinates ? chineseCoordy : undefined" :sign-map="signMap"
-            :show-coordinates="showCoordinates" :fuzzy-stone-placement="fuzzyStonePlacement"
-            :animate-stone-placement="animateStonePlacement" :paint-map="showPaintMap ? paintMap : undefined"
-            :heat-map="showHeatMap ? heatMap : undefined" :marker-map="showMarkerMap ? markerMap : undefined"
-            :ghost-stone-map="showGhostStones ? ghostStoneMap : undefined" :lines="showLines ? [
-                { type: 'line', v1: [15, 6], v2: [12, 15] },
-                { type: 'arrow', v1: [10, 4], v2: [5, 7] }
-            ] : []" :dimmed-map="showDimmedStones ? dimmedMap : []" :selected-map="showSelection ? selectedMap : []"
-            @click="onVertexClick" />
+        <div style="margin: 10px;float:right">
+            <div>
+                <el-button type="warning" @click="onReset">重置棋盘</el-button>
+            </div>
+            <form>
+                <!-- <div>
+                    <template v-for="(c, i) in checkBoxs">
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" style="marginRight: .5em;" :value="c.stateKey" v-model="checkedNames">
+                            <span style="user-select: none;" v-text="c.text" />
+                        </label>
+                    </template>
+                </div> -->
+
+                <!-- <div>
+                    <template v-for="(c, i) in checkBoxs">
+                        <div>
+                            <el-checkbox v-model="c.stateKey" size="large">{{ c.text }}</el-checkbox>
+                        </div>
+                    </template>
+                </div> -->
+            </form>
+
+        </div>
+
     </div>
 </template>
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
+import { ref } from "vue"
 
 const chineseCoordx = [
     '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
@@ -47,7 +54,9 @@ const chineseCoordx = [
 
 const chineseCoordy = [...Array(19)].map((_, i) => i);
 
-const rawSignMap = [
+const rawSignMap = [];
+
+const rawSignMap1 = [
     0, 0, 0, -1, -1, -1, 1, 0, 1, 1, -1, -1, 0, -1, 0, -1, -1, 1, 0,
     0, 0, -1, 0, -1, 1, 1, 1, 0, 1, -1, 0, -1, -1, -1, -1, 1, 1, 0,
     0, 0, -1, -1, -1, 1, 1, 0, 0, 1, 1, -1, -1, 1, -1, 1, 0, 1, 0,
@@ -197,6 +206,13 @@ const selectedMap = [...Array(19 * 19)].fill(false);
     selectedMap[offset] = true;
 });
 
+const windowInnerWidth = document.documentElement.clientWidth;
+const windowInnerHeight = document.documentElement.clientHeight;
+
+let cur_player = ref(-1);
+
+// const checkBoxs = ref(_checkBoxs)
+
 export default {
     name: 'Shudan',
     components: {
@@ -206,7 +222,7 @@ export default {
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
-            maxSize: 480,
+            maxSize: Math.min(windowInnerWidth, windowInnerHeight),
             showCoordinates: false,
             alternateCoordinates: false,
             showCorner: false,
@@ -234,11 +250,28 @@ export default {
         };
     },
 
+    mounted() {
+        //窗口尺寸改变
+        window.onresize = () => {
+            return (() => {
+                // this.$forceUpdate();//强制更新数据
+                this.$router.go(0);
+            })();
+        };
+    },
+
     methods: {
         onVertexClick: function (offset) {
             let signMap = JSON.parse(JSON.stringify(this.signMap));
-            signMap[offset] = Math.sign(Math.random() - 0.5) || 1;
+
+            signMap[offset] = cur_player.value;
+            cur_player.value = -cur_player.value;
             this.signMap = signMap;
+
+        },
+        onReset: function () {
+            this.signMap = JSON.parse(JSON.stringify(rawSignMap));
+            cur_player.value = -1;
         }
     },
 
@@ -272,7 +305,12 @@ export default {
                     this[stateKey] = newState;
             });
         }
-    }
+    },
+
+    destroyed() {
+        // 销毁
+        window.onresize = null;
+    },
 };
 </script>
 

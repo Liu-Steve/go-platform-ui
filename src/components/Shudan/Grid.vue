@@ -33,7 +33,7 @@ export default {
     computed: {
         lines() {
             const { width, height, xs, ys } = this;
-            const [x, y] = [xs[0], ys[0]].map(i => i === 0 ?  0.5 : 0);
+            const [x, y] = [xs[0], ys[0]].map(i => i === 0 ? 0.5 : 0);
             const calcLen = (val, sets, size) => {
                 return sets[sets.length - 1] === size - 1
                     ? (2 * sets.length - 1) * 0.5 - val
@@ -81,25 +81,11 @@ export default {
 </script>
 
 <template>
-<svg class="shudan-grid">
-    <rect
-        v-for="(l, i) in lines"
-        :key="`l${i}`"
-        :class="l.classes"
-        :x="l.x"
-        :y="l.y"
-        :width="l.width"
-        :height="l.height"
-        />
-    <circle
-        v-for="(p, i) in points"
-        :key="`p${i}`"
-        class="shudan-hoshi"
-        :cx="p.x"
-        :cy="p.y"
-        r=".1em"
-        />
-</svg>
+    <svg class="shudan-grid">
+        <rect v-for="(l, i) in lines" :key="`l${i}`" :class="l.classes" :x="l.x" :y="l.y" :width="l.width"
+            :height="l.height" />
+        <circle v-for="(p, i) in points" :key="`p${i}`" class="shudan-hoshi" :cx="p.x" :cy="p.y" r=".1em" />
+    </svg>
 </template>
 
 <style scoped>

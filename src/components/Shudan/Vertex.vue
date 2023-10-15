@@ -42,7 +42,7 @@ export default {
             default: undefined
         },
 
-        heat: { 
+        heat: {
             type: Object,
             default: undefined
         },
@@ -86,90 +86,32 @@ export default {
 </script>
 
 <template>
-<div
-    :class="classes"
-    style="position: relative;"
-    @click="$emit('click')"
-    @mousedown="$emit('mousedown')"
-    @mouseup="$emit('mouseup')"
-    @mousemove="$emit('mousemove')"
-    @mouseenter="$emit('mouseenter')"
-    @mouseleave="$emit('mouseleave')"
-    >
-    <div
-        v-if="!sign && !!marker"
-        key="marker"
-        class="shudan-marker"
-        style="z-index: 0;"
-        :title="marker.label"
-        />
-    <div
-        v-if="!sign && !!ghostStone"
-        key="ghost"
-        class="shudan-ghost"
-        style="z-index: 1;"
-        />
-    <div
-        key="stone"
-        class="shudan-stone"
-        style="z-index: 2;"
-        >
-        <div
-            v-if="!!sign"
-            key="shadow"
-            class="shudan-shadow"
-            />
-        <div
-            v-if="!!sign"
-            key="inner"
-            :class="[
+    <div :class="classes" style="position: relative;" @click="$emit('click')" @mousedown="$emit('mousedown')"
+        @mouseup="$emit('mouseup')" @mousemove="$emit('mousemove')" @mouseenter="$emit('mouseenter')"
+        @mouseleave="$emit('mouseleave')">
+        <div v-if="!sign && !!marker" key="marker" class="shudan-marker" style="z-index: 0;" :title="marker.label" />
+        <div v-if="!sign && !!ghostStone" key="ghost" class="shudan-ghost" style="z-index: 1;" />
+        <div key="stone" class="shudan-stone" style="z-index: 2;">
+            <div v-if="!!sign" key="shadow" class="shudan-shadow" />
+            <div v-if="!!sign" key="inner" :class="[
                 'shudan-inner',
                 'shudan-stone-image',
                 `shudan-random_${random}`,
                 `shudan-sign_${sign}`
-            ]"
-            v-text="sign"
-            />
-        <div
-            v-if="!!sign && !!marker"
-            key="marker"
-            class="shudan-marker"
-            :title="marker.label"
-            />
-    </div>
+            ]"/>
+            <div v-if="!!sign && !!marker" key="marker" class="shudan-marker" :title="marker.label" />
+        </div>
 
-    <div
-        v-if="!!paint"
-        key="paint"
-        class="shudan-paint"
-        style="z-index: 3;"
-        />
-    <div
-        v-if="selected"
-        key="selection"
-        class="shudan-selection"
-        style="z-index: 4;"
-        />
-    <div
-        v-if="!!heat"
-        key="heat"
-        class="shudan-heat"
-        style="z-index: 5;"
-        />
-    <div
-        v-if="!!heat"
-        key="heatlabel"
-        class="shudan-heatlabel"
-        style="z-index: 6;"
-        v-text="heat.text && heat.text.toString()"
-        />
-</div>
+        <div v-if="!!paint" key="paint" class="shudan-paint" style="z-index: 3;" />
+        <div v-if="selected" key="selection" class="shudan-selection" style="z-index: 4;" />
+        <div v-if="!!heat" key="heat" class="shudan-heat" style="z-index: 5;" />
+        <div v-if="!!heat" key="heatlabel" class="shudan-heatlabel" style="z-index: 6;"
+            v-text="heat.text && heat.text.toString()" />
+    </div>
 </template>
 
 <style scoped>
 .shudan-vertex div {
     position: absolute;
 }
-
-
 </style>

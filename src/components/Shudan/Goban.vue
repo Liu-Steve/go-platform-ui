@@ -4,7 +4,7 @@ import Grid from './Grid.vue';
 import Vertex from './Vertex.vue';
 import ULine from './Line.vue';
 import helper from './helper.js';
-// import { setTimeout } from 'timers';
+// import { setTimeout } from 'timers/promises';
 
 const defaultVertexSize = 24;
 const readjustShifts = function (shiftMap, boardSize, offset) {
@@ -257,15 +257,15 @@ export default {
                 }
 
                 // 延后清除效果(这样后续还可以再触发)
-                // this.$nextTick(function () {
-                //     this.clearAnimatedVerticesHandler = setTimeout(
-                //         () => {
-                //             this.animatedVertices = [];
-                //             this.clearAnimatedVerticesHandler = null;
-                //         },
-                //         200,
-                //     );
-                // });
+                this.$nextTick(function () {
+                    this.clearAnimatedVerticesHandler = window.setTimeout(
+                        () => {
+                            this.animatedVertices = [];
+                            this.clearAnimatedVerticesHandler = null;
+                        },
+                        200,
+                    );
+                });
             }
         },
 
@@ -410,5 +410,4 @@ export default {
     background-size: 100% 100%;
 
 }
-
 </style>
