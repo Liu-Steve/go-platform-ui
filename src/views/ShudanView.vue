@@ -1,6 +1,6 @@
 <template>
-    <div style="display: flex;;">
-        <div style="flex:1 width: 100vh; height: 100vh; float:left">
+    <div style="display: flex; padding: 10px;">
+        <div style="width: calc(100vh - 20px); height: calc(100vh - 20px);">
             <Goban :max-width="maxSize" :max-height="maxSize" :animate="true" :busy="isBusy"
                 :range-x="showCorner ? [8, 18] : undefined" :range-y="showCorner ? [12, 18] : undefined"
                 :coord-x="alternateCoordinates ? chineseCoordx : undefined"
@@ -222,7 +222,7 @@ export default {
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
-            maxSize: Math.min(windowInnerWidth, windowInnerHeight),
+            maxSize: Math.min(windowInnerWidth, windowInnerHeight) - 15,
             showCoordinates: false,
             alternateCoordinates: false,
             showCorner: false,
