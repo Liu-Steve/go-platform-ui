@@ -1,12 +1,10 @@
 <template>
     <div style="display: flex; padding: 10px;">
         <div style="width: calc(100vh - 20px); height: calc(100vh - 20px);">
-            <Goban :max-width="maxSize" :max-height="maxSize" :animate="true" :busy="isBusy"
+            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" :animate="true" :busy="false"
                 :range-x="showCorner ? [8, 18] : undefined" :range-y="showCorner ? [12, 18] : undefined"
-                :coord-x="alternateCoordinates ? chineseCoordx : undefined"
-                :coord-y="alternateCoordinates ? chineseCoordy : undefined" :sign-map="signMap"
-                :show-coordinates="showCoordinates" :fuzzy-stone-placement="fuzzyStonePlacement"
-                :animate-stone-placement="animateStonePlacement" :paint-map="showPaintMap ? paintMap : undefined"
+                :coord-x="chineseCoordx" :coord-y="chineseCoordy" :show-coordinates="false" :fuzzy-stone-placement="false"
+                :animate-stone-placement="false" :paint-map="showPaintMap ? paintMap : undefined"
                 :heat-map="showHeatMap ? heatMap : undefined" :marker-map="showMarkerMap ? markerMap : undefined"
                 :ghost-stone-map="showGhostStones ? ghostStoneMap : undefined" :lines="showLines ? [
                     { type: 'line', v1: [15, 6], v2: [12, 15] },
@@ -14,29 +12,28 @@
                 ] : []" :dimmed-map="showDimmedStones ? dimmedMap : []"
                 :selected-map="showSelection ? selectedMap : []" @click="onVertexClick" />
         </div>
+        <!-- 参数解释 -->
+        <!-- max-width & max-height 长宽 -->
+        <!-- sign-map 落子情况 -->
+        <!-- animate 动画（暂时不明） -->
+        <!-- busy 为1时棋盘不能下棋 -->
+        <!-- range-x & range-y 显示局部棋盘 -->
+        <!-- coord-x & coord-y 横纵坐标表示（目前效果不好） -->
+        <!-- show-coordinates 是否显示坐标轴 -->
+        <!-- fuzzy-stone-placement 暂时不清楚 -->
+        <!-- animate-stone-placement 暂时不清楚 -->
+        <!-- paint-map 显示黑色或白色的背景（暂时有问题） -->
+        <!-- heat-map 显示文字数据 -->
+        <!-- marker-map 显示标记（暂时有问题） -->
+        <!-- ghost-stone-map 显示隐形棋子（暂时有问题）-->
+        <!-- lines 显示线条 -->
+        <!-- dimmed-map 显示无效的落子点（暂时有问题） -->
+        <!-- selected-map 显示选中的点（暂时有问题） -->
 
         <div style="margin: 10px;float:right">
             <div>
                 <el-button type="warning" @click="onReset">重置棋盘</el-button>
             </div>
-            <form>
-                <!-- <div>
-                    <template v-for="(c, i) in checkBoxs">
-                        <label style="display: flex; align-items: center;">
-                            <input type="checkbox" style="marginRight: .5em;" :value="c.stateKey" v-model="checkedNames">
-                            <span style="user-select: none;" v-text="c.text" />
-                        </label>
-                    </template>
-                </div> -->
-
-                <!-- <div>
-                    <template v-for="(c, i) in checkBoxs">
-                        <div>
-                            <el-checkbox v-model="c.stateKey" size="large">{{ c.text }}</el-checkbox>
-                        </div>
-                    </template>
-                </div> -->
-            </form>
 
         </div>
 
@@ -47,171 +44,22 @@
 import Goban from '../components/Shudan/Goban.vue';
 import { ref } from "vue"
 
-const chineseCoordx = [
-    '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-    '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九'
-];
+const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
-const chineseCoordy = [...Array(19)].map((_, i) => i);
+let rawSignMap = new Array(19 * 19).fill(0);
 
-const rawSignMap = [];
-
-const rawSignMap1 = [
-    0, 0, 0, -1, -1, -1, 1, 0, 1, 1, -1, -1, 0, -1, 0, -1, -1, 1, 0,
-    0, 0, -1, 0, -1, 1, 1, 1, 0, 1, -1, 0, -1, -1, -1, -1, 1, 1, 0,
-    0, 0, -1, -1, -1, 1, 1, 0, 0, 1, 1, -1, -1, 1, -1, 1, 0, 1, 0,
-    0, 0, 0, 0, -1, -1, 1, 0, 1, -1, 1, 1, 1, 1, 1, 0, 1, 0, 0,
-    0, 0, 0, 0, -1, 0, -1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0,
-    0, 0, -1, 0, 0, -1, -1, 1, 0, -1, -1, 1, -1, -1, 0, 1, 0, 0, 1,
-    0, 0, 0, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, 1, 1, 1,
-    0, 0, -1, 1, 1, 0, 1, -1, -1, 1, 0, 1, -1, 0, 1, -1, -1, -1, 1,
-    0, 0, -1, -1, 1, 1, 1, 0, -1, 1, -1, -1, 0, -1, -1, 1, 1, 1, 1,
-    0, 0, -1, 1, 1, -1, -1, -1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, -1,
-    -1, -1, -1, -1, 1, 1, 1, -1, 0, -1, 1, -1, -1, 0, -1, 1, 1, -1, 0,
-    -1, 1, -1, 0, -1, -1, -1, -1, -1, -1, 1, -1, 0, -1, -1, 1, -1, 0, -1,
-    1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 0, 1, -1, 0, -1, 1, -1, -1, 0,
-    0, 1, -1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, 1,
-    0, 0, -1, 1, 0, 0, 1, 1, -1, -1, 0, 1, -1, 1, -1, 1, -1, 0, -1,
-    0, 0, 1, 0, 1, 0, 1, 1, 1, -1, -1, 1, -1, -1, 1, -1, -1, -1, 0,
-    0, 0, 0, 0, 1, 1, 0, 1, -1, 0, -1, -1, 1, 1, 1, 1, -1, -1, -1,
-    0, 0, 1, 1, -1, 1, 1, -1, 0, -1, -1, 1, 1, 1, 1, 0, 1, -1, 1,
-    0, 0, 0, 1, -1, -1, -1, -1, -1, 0, -1, -1, 1, 1, 0, 1, 1, 1, 0
-];
-
-const paintMap = [
-    -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1, 1,
-    -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1,
-    -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, 1,
-    -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,
-    -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, -1, -1, 0, 1, 1, 1, 1,
-    -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, 1, 1, 1,
-    -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, 0, 1, -1, -1, -1, -1, -1, -1, 1,
-    -1, -1, -1, -1, 1, 1, 1, 0, -1, 1, -1, -1, -1, -1, -1, 1, 1, 1, 1,
-    -1, -1, -1, 1, 1, -1, -1, -1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, -1,
-    -1, -1, -1, -1, 1, 1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, -1, -1,
-    -1, 1, -1, 0, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, -1,
-    1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, 1, -1, -1, -1,
-    1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, 1, 1, -1, -1,
-    1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 0, 1, -1, -1, -1, 1, -1, -1, -1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, -1, -1, -1, -1,
-    1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, -1,
-    1, 1, 1, 1, -1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, 1,
-    1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1
-];
-
-const heatMap = (() => {
-    let _ = null;
-    let O = (strength, text) => ({ strength, text });
-
-    return [
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, O(7), O(9, '80%\n13.5k'), _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, O(3), _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, O(2), _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, O(1, '20%\n111'), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, O(5, '67%\n2315'), O(4), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _
-    ];
-})();
-
-const markerMap = (() => {
-    let _ = null;
-    let O = { type: 'circle' };
-    let X = { type: 'cross' };
-    let T = { type: 'triangle' };
-    let Q = { type: 'square' };
-    let $ = { type: 'point' };
-    let S = { type: 'loader' };
-    let L = label => ({ type: 'label', label });
-    let A = L('a');
-    let B = L('b');
-    let C = L('c');
-
-    return [
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, O, O, O, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, T, T, T, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, $, $, $, _, _, _, _, _, _, _, _, _, _, _, S, S, S, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, Q, _, _, _, _, _, _, _, _, _, L('Long\nlabel with linebreak'),
-        _, _, _, _, _, _, _, _, Q, _, _, _, _, _, _, _, _, _, C,
-        _, _, _, _, _, _, _, _, Q, _, _, _, _, _, _, _, _, _, B,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, A
-    ];
-})();
-
-const ghostStoneMap = (() => {
-    let _ = null;
-    let O = t => ({ sign: -1, type: t });
-    let X = t => ({ sign: 1, type: t });
-    let o = t => ({ sign: -1, type: t, faint: true });
-    let x = t => ({ sign: 1, type: t, faint: true });
-
-    return [
-        X(), x(), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        O(), o(), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        X('good'), x('good'), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        X('interesting'), x('interesting'), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        X('doubtful'), x('doubtful'), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        X('bad'), x('bad'), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-        _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _
-    ];
-})();
-
-const dimmedMap = [...Array(19 * 19)].fill(false);
-[[2, 14], [2, 13], [5, 13], [6, 13], [9, 3], [9, 5],
-[10, 5], [14, 7], [13, 13], [13, 14], [18, 13]].forEach(([x, y]) => {
-    const offset = y * 19 + x;
-    dimmedMap[offset] = true;
-});
-
-const selectedMap = [...Array(19 * 19)].fill(false);
-[[9, 7], [9, 8], [10, 7], [10, 8]].forEach(([x, y]) => {
-    const offset = y * 19 + x;
-    selectedMap[offset] = true;
-});
+const paintMap = [];
+const heatMap = [];
+const markerMap = [];
+const ghostStoneMap = [];
+const dimmedMap = [];
+const selectedMap = [];
 
 const windowInnerWidth = document.documentElement.clientWidth;
 const windowInnerHeight = document.documentElement.clientHeight;
 
-let cur_player = ref(-1);
-
-// const checkBoxs = ref(_checkBoxs)
+let cur_player = ref(1);
 
 export default {
     name: 'Shudan',
@@ -262,16 +110,17 @@ export default {
 
     methods: {
         onVertexClick: function (offset) {
-            let signMap = JSON.parse(JSON.stringify(this.signMap));
-
-            signMap[offset] = cur_player.value;
-            cur_player.value = -cur_player.value;
-            this.signMap = signMap;
-
+            console.log(offset);
+            if (rawSignMap[offset] == 0) {
+                rawSignMap[offset] = cur_player.value;
+                cur_player.value = -cur_player.value;
+                this.signMap = JSON.parse(JSON.stringify(rawSignMap));
+            }
         },
         onReset: function () {
+            rawSignMap = new Array(19 * 19).fill(0);
             this.signMap = JSON.parse(JSON.stringify(rawSignMap));
-            cur_player.value = -1;
+            cur_player.value = 1;
         }
     },
 
