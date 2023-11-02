@@ -67,7 +67,7 @@
         </div>
 
         <div style="margin-top: 75px;">
-            <el-button style="width: 270px;" type="warning" plain>
+            <el-button @click="register" style="width: 270px;" type="warning" plain>
                 立即注册
             </el-button>
         </div>
@@ -85,6 +85,7 @@
 <script setup>
 import { User, Lock, Message, EditPen } from '@element-plus/icons-vue';
 import router from '../../router';
+import { get, post } from '../../net';
 import { reactive, ref } from "vue";
 
 const form = reactive({
@@ -176,6 +177,40 @@ const onValidate = (prop, isValid) => {
         isEmailValid.value = isValid;
     }
 }
+
+
+const register = () =>{
+    if (!form.username) {
+        ElMessage.warning('请填写用户名')
+    }
+    else if(!form.password){
+        ElMessage.warning('请填写密码')
+    }
+    else if(form.password_repeat != form.password){
+        ElMessage.warning('两次填写的密码需一致')
+    }
+    else {
+        post('/api/user/register', {
+            "username": form.username,
+            "password": form.password,
+            "email": form.email,
+        }, (response) => {
+            if(response.resultCode != 0) ElMessage.warning('账号已被注册！')
+            else {
+                ElMessage.success('注册成功!')
+                router.push('/')
+            }
+            // ElMessage.success('登陆成功!')
+            // if (form.remembered) {
+            //     localStorage.setItem('Authorization', message.token);   // 持久化
+            // }
+            // axios.defaults.headers.common['Authorization'] = `Bearer ${message.token}`;
+            // router.push('/index')
+        }
+        )
+    }
+}
+
 
 </script>
 
