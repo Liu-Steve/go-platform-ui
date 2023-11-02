@@ -8,7 +8,7 @@
             <el-button @click="logout" type="danger" plain>退出登录</el-button>
 
             <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button>
-            <el-button @click="testfunc" type="success" plain>test</el-button>
+            <!--<el-button @click="testfunc" type="success" plain>test</el-button>-->
         </div>
     </div>
 </template>
@@ -29,26 +29,26 @@ const logout = () => {
     router.push('/')
 }
 
-const testfunc = () => {
-    // get("/api/hello/name", (data, status) => 
-    // {
-    //     ElMessage(data.resultMessage);
-    //     console.log(data);
-    //     console.log(status);
+//const testfunc = () => {
+//     // get("/api/hello/name", (data, status) => 
+//     // {
+//     //     ElMessage(data.resultMessage);
+//     //     console.log(data);
+//     //     console.log(status);
 
-    // });
+//     // });
 
-    var loc = window.location, new_uri; 
-    if (loc.protocol === "https:") { 
-        new_uri = "wss:"; 
-    } else { 
-        new_uri = "ws:"; 
-    } 
-    new_uri += "//" + loc.host + "/websocket path";
+//     var loc = window.location, new_uri; 
+//     if (loc.protocol === "https:") { 
+//         new_uri = "wss:"; 
+//     } else { 
+//         new_uri = "ws:"; 
+//     } 
+//     new_uri += "//" + loc.host + "/websocket path";
 
-    let ws = new WebSocket(new_uri);
-    ws.send("hello");
-}
+//     let ws = new WebSocket(new_uri);
+//     ws.send("hello");
+// }
 
 </script>
 
