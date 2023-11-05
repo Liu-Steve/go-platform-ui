@@ -22,7 +22,11 @@ export default defineConfig({
     port: '8081',
     proxy: {
       '/api': {
-        target: 'https://dragondj.space',
+        target: 'http://127.0.0.1:8084',
+        changeOrigin: true
+      },
+      '/ws': {
+        target: "http://127.0.0.1:8084",
         changeOrigin: true
       }
     }

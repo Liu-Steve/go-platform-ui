@@ -39,7 +39,7 @@ const router = createRouter({
  * 全局前置路由守卫，每一次路由跳转前都进入这个 beforeEach 函数
  */
 router.beforeEach((to, from, next) => {
-  if (to.path == '/') {
+  if (to.path === '/' || to.path === '/register') {
     // 登录或者注册才可以往下进行
     next();
   } else {
