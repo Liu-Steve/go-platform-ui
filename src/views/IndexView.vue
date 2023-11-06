@@ -22,7 +22,7 @@
         </el-row>
 
 
-        <!-- <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button> -->
+        <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button>
 
         <div>
             <!-- 创建房间弹窗 -->
