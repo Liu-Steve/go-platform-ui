@@ -1,3 +1,5 @@
+import { get } from '../net/index.js';
+
 // WebSocket
 var ws = null;
 // WebSocket连接地址
@@ -24,7 +26,8 @@ function ws_create(url) {
 }
 
 let chessboard;
-let user2;
+let user2 = {id: "", name: ""};
+let roomowner = {id: "", name: ""};
 
 // WebSocket 事件创建
 function ws_event(ws, url) {
@@ -70,10 +73,18 @@ function ws_event(ws, url) {
             chessboard = event.data.message.board;
             break;
             case 10://ROOM_ENTER
-            
+            roomowner.id = event.data.message.createUserId
+            roomowner.name = event.data.message.createUserName;
+            user2.id = event.data.message.secondUserId;
+            user2.name = get("/api/user/" + user2.id, 
+                (message)=>{user2.name = message.result.username})
             break;
             case 11://ROOM_EXIT;
-
+            user2.id = "";
+            user2.name = "";
+            roomowner.id = localStorage.getItem("userid");
+            roomowner.name = get("/api/user/" + roomowner.id, 
+            (message)=>{roomowner.name = message.result.username});
             break;
           }
 		}
@@ -124,5 +135,6 @@ export {
     ws_url,
     ws_create,
     chessboard,
-    user2
+    user2,
+    roomowner
 }
