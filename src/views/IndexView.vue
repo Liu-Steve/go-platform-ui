@@ -13,7 +13,7 @@
             </el-col>
 
             <el-col>
-                <el-button @click="joinRoom" class="button" type="success" size="large" plain>加入房间</el-button>
+                <el-button @click="joinRoomDialogVisible.state = true" class="button" type="success" size="large" plain>加入房间</el-button>
             </el-col>
 
             <el-col>
@@ -74,7 +74,7 @@ const createRoom = () => {
 }
 
 const joinRoom = () => {
-    get("/api/room/enter/" + localStorage.getItem("userid") + form.roomid,
+    get("/api/room/enter/" + localStorage.getItem("userid") + "/" + form.roomid,
         (message) => {
             localStorage.setItem("roomid", message.result.roomId);
             roomowner.id = message.result.createUserId;
