@@ -82,6 +82,44 @@ function get(url, success, failure = defaultFailure, error = defaultError) {
     })
 }
 
+function put(url, data, success, failure = defaultFailure, error = defaultError){
+    axios.put(url, data, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((response) => {
+        // 状态代码 2xx
+        if (response.data.resultCode != 0) {
+            failure(`${response.data.resultMessage} 错误代码: ${response.data.resultCode}`)
+        } else {
+            success(response.data, response.status)
+        }
+    }).catch((err) => {
+        if (err.response) {
+            if (err.response.status === 401) {   // 未登录
+                router.push('/')
+                return
+            }
+            if (err.response.status === 403) {   // 无访问权限
+                failure('对不起，您没有权限访问')
+                return
+            }
+            // 其他状态代码超出 2xx 情形
+            failure(`请求错误 HTTP 代码: ${err.response.status}`)
+            console.error(err.response)
+        }
+        else if (err.request) {
+            failure('请求超时')
+            console.error(err.request)
+        }
+        else {
+            error()
+            console.error(err.message)
+        }
+        console.log(err.config)
+    })
+}
+
 export default {
     setup() {
         const router = useRouter();
@@ -89,4 +127,4 @@ export default {
     },
 }
 
-export { get, post }
+export { get, post, put }

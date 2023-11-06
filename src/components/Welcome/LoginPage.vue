@@ -50,6 +50,7 @@ import { reactive } from "vue";
 import { get, post } from '../../net';
 import { useRouter } from 'vue-router'
 import axios from "axios";
+import { getRowIdentity } from 'element-plus/es/components/table/src/util';
 
 const router = useRouter();
 
@@ -58,6 +59,9 @@ const form = reactive({
     "password": "",
     "remembered": false,
 })
+
+// form.username = localStorage.getItem("username");
+// form.password = localStorage.getItem("password");
 
 const login = () => {
     if (!form.username || !form.password) {
@@ -70,9 +74,14 @@ const login = () => {
         }, (message) => {
             ElMessage.success('登陆成功!')
             if (form.remembered) {
-                localStorage.setItem('Authorization', message.token);   // 持久化
+                // localStorage.setItem('username', form.username);
+                // localStorage.setItem('password', form.password); 
+                // localStorage.setItem("remembered", form.remembered)   // 持久化
             }
-            axios.defaults.headers.common['Authorization'] = `Bearer ${message.token}`;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${message.result.token}`;
+            localStorage.setItem("userid", message.result.user.id)
+            //localStorage.setItem("wstoken", message.result.token)
+
             router.push('/index')
         }
         )
