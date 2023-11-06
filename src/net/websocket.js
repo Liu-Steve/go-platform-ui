@@ -23,6 +23,9 @@ function ws_create(url) {
     }
 }
 
+let chessboard;
+let user2;
+
 // WebSocket 事件创建
 function ws_event(ws, url) {
 	ws.onopen = function (event) {
@@ -50,6 +53,29 @@ function ws_event(ws, url) {
 		// 处理数据，只处理非心跳检测的数据
 		if (event.data != 'check') {
 		  // 处理数据
+          switch(event.data.mode){
+            case 0://CHESS_WAIT
+            chessboard = event.data.message.board;
+            break;
+            case 1://CHESS_START
+            chessboard = event.data.message.board;
+            break;
+            case 2://CHESS_STOP_ONCE
+            chessboard = event.data.message.board;
+            break;
+            case 3://CHESS_STOP_ONCE_ANOTHER
+            chessboard = event.data.message.board;
+            break;
+            case 4://CHESS_REQUEST_STOP
+            chessboard = event.data.message.board;
+            break;
+            case 10://ROOM_ENTER
+            
+            break;
+            case 11://ROOM_EXIT;
+
+            break;
+          }
 		}
 	};
 }
@@ -96,5 +122,7 @@ var ws_heartCheck = {
 export {
     ws,
     ws_url,
-    ws_create
+    ws_create,
+    chessboard,
+    user2
 }

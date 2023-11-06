@@ -61,7 +61,7 @@
 <script>
 import Goban from '../components/Shudan/Goban.vue';
 import { ref } from "vue";
-import { get } from "../net";
+import { get, post } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
 import { CaretLeft } from "@element-plus/icons-vue";
