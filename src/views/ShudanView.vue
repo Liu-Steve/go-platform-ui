@@ -13,7 +13,7 @@
                     <!-- todo:userid -->
                     <span style="font-size: large;">用户1</span>
                     <el-icon v-show="player_is_black">
-                        <caret-left />
+                        <CaretLeft />
                     </el-icon>
                 </el-col>
                 <el-col :span="12">
@@ -21,17 +21,17 @@
                     <!-- todo:userid -->
                     <span style="font-size: large;">用户2</span>
                     <el-icon v-show="!player_is_black">
-                        <caret-left />
+                        <CaretLeft />
                     </el-icon>
                 </el-col>
 
             </el-row>
 
-            <!-- <el-row>
+            <el-row>
                 <el-col>
                     <el-button type="warning" @click="onReset">重置棋盘</el-button>
                 </el-col>
-            </el-row> -->
+            </el-row>
 
             <el-row>
                 <el-col :span="6">
@@ -55,7 +55,6 @@
         </div>
 
     </div>
-
 </template>
 
 <script>
@@ -68,9 +67,6 @@ import { CaretLeft } from "@element-plus/icons-vue";
 import { ElMessage } from 'element-plus';
 //import { router } from "../router"
 
-const blackUrl = ref(black);
-const whiteUrl = ref(white);
-
 const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 const windowInnerWidth = document.documentElement.clientWidth;
@@ -78,13 +74,14 @@ const windowInnerHeight = document.documentElement.clientHeight;
 
 let rawSignMap = new Array(19 * 19).fill(0);
 let cur_player = ref(1);
-let player_is_black = ref(true);
+// let player_is_black = ref(true);
 
 export default {
     name: 'Shudan',
 
     components: {
-        Goban
+        Goban,
+        CaretLeft,
     },
 
     data: function () {
@@ -94,6 +91,10 @@ export default {
             showCoordinates: false,
             isBusy: false,
             isAnimate: false,
+            player_is_black: true,
+
+            blackUrl: black,
+            whiteUrl: white,
 
             rawSignMap,
             chineseCoordx,
@@ -103,11 +104,10 @@ export default {
 
     methods: {
         onVertexClick: function (offset) {
-            console.log(offset);
             if (rawSignMap[offset] == 0) {
                 rawSignMap[offset] = cur_player.value;
                 cur_player.value = -cur_player.value;
-                player_is_black.value = cur_player.value === 1 ? true : false;
+                this.player_is_black = cur_player.value === 1 ? true : false;
                 this.signMap = JSON.parse(JSON.stringify(rawSignMap));
             }
         },
@@ -115,11 +115,11 @@ export default {
             rawSignMap = new Array(19 * 19).fill(0);
             this.signMap = JSON.parse(JSON.stringify(rawSignMap));
             cur_player.value = 1;
-            player_is_black.value = true;
+            this.player_is_black = true;
         },
-        exitRoom: function() {
+        exitRoom: function () {
             get("/api/room/exit/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
-             ()=>{ElMessage.success("返回成功")});
+                () => { ElMessage.success("返回成功") });
             this.$router.push('/index');
         }
     },
