@@ -26,6 +26,7 @@
         <div style="margin: 10px;float:right">
             <div>
                 <el-button type="warning" @click="onReset">重置棋盘</el-button>
+                <el-button type="warning" @click="exitRoom">退出房间</el-button>
             </div>
         </div>
 
@@ -34,7 +35,8 @@
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
-import { ref } from "vue"
+import { ref } from "vue";
+import { get } from "../net";
 
 const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
@@ -78,6 +80,9 @@ export default {
             rawSignMap = new Array(19 * 19).fill(0);
             this.signMap = JSON.parse(JSON.stringify(rawSignMap));
             cur_player.value = 1;
+        },
+        exitRoom: function() {
+            get("/api/room/exit/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"), ()=>{});
         }
     },
 
