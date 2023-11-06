@@ -54,28 +54,30 @@ function ws_event(ws, url) {
 		ws_heartCheck.reset().start();
 
 		// 处理数据，只处理非心跳检测的数据
-		if (event.data != 'check') {
+		if (event.data != 'Echo message: check') {
 		  // 处理数据
-          switch(event.data.mode){
+          let data = JSON.parse(event.data);
+
+          switch(data.mode){
             case 0://CHESS_WAIT
-            chessboard = event.data.message.board;
+            chessboard = data.message.board;
             break;
             case 1://CHESS_START
-            chessboard = event.data.message.board;
+            chessboard = data.message.board;
             break;
             case 2://CHESS_STOP_ONCE
-            chessboard = event.data.message.board;
+            chessboard = data.message.board;
             break;
             case 3://CHESS_STOP_ONCE_ANOTHER
-            chessboard = event.data.message.board;
+            chessboard = data.message.board;
             break;
             case 4://CHESS_REQUEST_STOP
-            chessboard = event.data.message.board;
+            chessboard = data.message.board;
             break;
             case 10://ROOM_ENTER
-            roomowner.id = event.data.message.createUserId
-            roomowner.name = event.data.message.createUserName;
-            user2.id = event.data.message.secondUserId;
+            roomowner.id = data.message.createUserId
+            roomowner.name = data.message.createUserName;
+            user2.id = data.message.secondUserId;
             user2.name = get("/api/user/" + user2.id, 
                 (message)=>{user2.name = message.result.username})
             break;
