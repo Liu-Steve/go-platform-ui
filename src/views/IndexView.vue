@@ -21,9 +21,6 @@
             </el-col>
         </el-row>
 
-
-        <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button>
-
         <div>
             <!-- 创建房间弹窗 -->
             <el-dialog title="收货地址" v-model="joinRoomDialogVisible.state">
