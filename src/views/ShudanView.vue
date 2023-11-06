@@ -28,8 +28,11 @@
             </el-row>
 
             <el-row>
-                <el-col>
+                <el-col :span="8">
                     <el-button type="warning" @click="onReset">重置棋盘</el-button>
+                </el-col>
+                <el-col :span="8">
+                    <el-button type="warning" @click="{ showDialog = true; console.log(showDialog) }">显示弹窗</el-button>
                 </el-col>
             </el-row>
 
@@ -53,13 +56,39 @@
             </el-row>
 
         </div>
-
     </div>
+    <!-- 创建棋局弹窗 -->
+    <el-dialog title="房间ID" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false">
+        <div style="text-align: center;">
+            <el-row>
+                <el-col>
+                    <img :src="blackUrl" class="stone">
+                    <span style="font-size: large;">用户1</span>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <img :src="whiteUrl" class="stone">
+                    <span style="font-size: large;">用户2</span>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <el-button type="warning" @click="">切换黑白方</el-button>
+                </el-col>
+            </el-row>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showDialog = false">取 消</el-button>
+            <el-button type="primary" @click="showDialog = false">确 定</el-button>
+        </div>
+    </el-dialog>
 </template>
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
-import { ref } from "vue";
+import { ref, reactive} from "vue";
 import { get, post } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
@@ -74,7 +103,11 @@ const windowInnerHeight = document.documentElement.clientHeight;
 
 let rawSignMap = new Array(19 * 19).fill(0);
 let cur_player = ref(1);
-// let player_is_black = ref(true);
+
+
+//todo
+
+
 
 export default {
     name: 'Shudan',
@@ -84,6 +117,14 @@ export default {
         CaretLeft,
     },
 
+    // setup() {
+    //     let showDialog = reactive({ state: true });
+
+    //     return{
+    //         showDialog,
+    //     }
+    // },
+
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
@@ -92,6 +133,7 @@ export default {
             isBusy: false,
             isAnimate: false,
             player_is_black: true,
+            showDialog: true,
 
             blackUrl: black,
             whiteUrl: white,
@@ -99,6 +141,15 @@ export default {
             rawSignMap,
             chineseCoordx,
             chineseCoordy,
+
+            //todo
+            // roomId,
+            // username_Owner,
+            // username_User2,
+
+            // blackPlayer: username_Owner,
+            // whitePlayer,
+
         };
     },
 
@@ -121,6 +172,9 @@ export default {
             get("/api/room/exit/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
                 () => { ElMessage.success("返回成功") });
             this.$router.push('/index');
+        },
+        changePlayer: function () {
+
         }
     },
 
@@ -165,6 +219,7 @@ export default {
 <style scope>
 .box {
     width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     background-color: antiquewhite;
