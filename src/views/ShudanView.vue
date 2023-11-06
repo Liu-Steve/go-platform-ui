@@ -56,11 +56,9 @@
             </el-row>
 
         </div>
-    </div>
 
-    <!-- 创建棋局弹窗 -->
-    <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false">
+        <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false" :key="Math.random()">
         <div style="text-align: center;">
             <el-row>
                 <el-col>
@@ -90,23 +88,28 @@
             <el-button type="primary" @click="createGame">确 定</el-button>
         </div>
     </el-dialog>
+    </div>
+
+    <!-- 创建棋局弹窗 -->
+    
 </template>
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
-import { ref, reactive } from "vue";
+import { ref, reactive, getCurrentInstance, VueElement} from "vue";
 import { get, post } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
 import { CaretLeft } from "@element-plus/icons-vue";
 import { ElMessage } from 'element-plus';
-import { chessboard, user2, roomowner } from '@/net/websocket.js'
+import { chessboard, user2, roomowner, registerCallBack, unregisterCallBack } from '../net/websocket.js'
 //import { router } from "../router"
 
 const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 const windowInnerWidth = document.documentElement.clientWidth;
 const windowInnerHeight = document.documentElement.clientHeight;
+
 
 let rawSignMap = new Array(19 * 19).fill(0);
 let cur_player = ref(1);
@@ -156,6 +159,15 @@ export default {
             // whitePlayer,
 
         };
+    },
+
+    created() {
+        registerCallBack((roomowner, user2, chessboard) => {
+            this.blackPlayer.id = roomowner;
+            this.whitePlayer = user2;
+            //this.$forceUpdate();
+            //getCurrentInstance().ctx.$forceUpdate();
+        });
     },
 
     methods: {
@@ -221,6 +233,7 @@ export default {
     },
 
     destroyed() {
+        unregisterCallBack();
         // 销毁
         window.onresize = null;
     },

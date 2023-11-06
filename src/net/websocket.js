@@ -28,6 +28,7 @@ function ws_create(url) {
 let chessboard;
 let user2 = {id: "", name: ""};
 let roomowner = {id: "", name: ""};
+let callBack = () => {};
 
 // WebSocket 事件创建
 function ws_event(ws, url) {
@@ -89,8 +90,17 @@ function ws_event(ws, url) {
             (message)=>{roomowner.name = message.result.username});
             break;
           }
+            callBack(roomowner, user2, chessboard);
 		}
 	};
+}
+
+function registerCallBack(func) {
+    callBack = func;
+}
+
+function unregisterCallBack() {
+    callBack = () => {};
 }
 
 // 重新连接websocker(WebSocket连接地址)
@@ -138,5 +148,7 @@ export {
     ws_create,
     chessboard,
     user2,
-    roomowner
+    roomowner,
+    registerCallBack,
+    unregisterCallBack
 }
