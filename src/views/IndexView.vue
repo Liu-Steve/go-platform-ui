@@ -23,21 +23,15 @@
 
         <div>
             <!-- 创建房间弹窗 -->
-            <el-dialog title="收货地址" v-model="joinRoomDialogVisible.state">
+            <el-dialog title="加入房间" v-model="joinRoomDialogVisible.state" width="40%">
                 <el-form :model="form">
-                    <el-form-item label="活动名称" :label-width="formLabelWidth">
-                        <el-input v-model="form.name" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="活动区域" :label-width="formLabelWidth">
-                        <el-select v-model="form.region" placeholder="请选择活动区域">
-                            <el-option label="区域一" value="shanghai"></el-option>
-                            <el-option label="区域二" value="beijing"></el-option>
-                        </el-select>
+                    <el-form-item label="房间ID" :label-width="formLabelWidth">
+                        <el-input v-model="form.roomid" autocomplete="off"></el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                    <el-button @click="joinRoomDialogVisible.state = false">取 消</el-button>
+                    <el-button type="primary" @click="joinRoom">确 定</el-button>
                 </div>
             </el-dialog>
         </div>
@@ -52,6 +46,7 @@ import { reactive } from "vue";
 import { get, post, put } from '../net';
 import { Loading } from 'element-plus/es/components/loading/src/service';
 import { ref } from 'vue';
+import { roomowner, user2 } from "../net/websocket"
 
 const router = useRouter();
 
@@ -64,27 +59,30 @@ const logout = () => {
 
 let joinRoomDialogVisible = reactive({ state: false });
 let form = reactive({
-    name: '',
-    region: '',
-    date1: '',
-    date2: '',
-    delivery: false,
-    type: [],
-    resource: '',
-    desc: ''
+    roomid: '',
 })
 
 const createRoom = () => {
     put('/api/room/' + localStorage.getItem("userid"), {},
         (message) => {
             localStorage.setItem("roomid", message.result.roomId);
+            roomowner.name = message.result.createUserName;
+            roomowner.id = message.result.createUserId;
             ElMessage.success('创建成功!');
             router.push('/game');
         })
 }
 
 const joinRoom = () => {
-    joinRoomDialogVisible.state = true;
+    get("/api/room/enter/" + localStorage.getItem("userid") + form.roomid,
+        (message) => {
+            localStorage.setItem("roomid", message.result.roomId);
+            roomowner.id = message.result.createUserId;
+            roomowner.name = message.result.createUserName;
+            user2.name = localStorage.getItem("username");
+            user2.id = localStorage.getItem("userid");
+            router.push("/game");
+        })
 }
 
 </script>
