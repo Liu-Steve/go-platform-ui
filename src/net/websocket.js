@@ -1,4 +1,7 @@
 import { get } from '../net/index.js';
+import mitt from 'mitt';
+
+export const bus = mitt();
 
 // WebSocket
 var ws = null;
@@ -25,10 +28,10 @@ function ws_create(url) {
     }
 }
 
-let chessboard;
+let chessboard = new Array(19).fill(Array(19).fill(-1));
 let user2 = {id: "", name: ""};
 let roomowner = {id: "", name: ""};
-let callBack = () => {};
+// let callBack = () => {};
 
 // WebSocket 事件创建
 function ws_event(ws, url) {
@@ -90,18 +93,20 @@ function ws_event(ws, url) {
             (message)=>{roomowner.name = message.result.username});
             break;
           }
-            callBack(roomowner, user2, chessboard);
+            // callBack(roomowner, user2, chessboard);
+            bus.emit("websocket", {roomowner: roomowner, user2: user2, chessboard: chessboard})
+
 		}
 	};
 }
 
-function registerCallBack(func) {
-    callBack = func;
-}
+// function registerCallBack(func) {
+//     callBack = func;
+// }
 
-function unregisterCallBack() {
-    callBack = () => {};
-}
+// function unregisterCallBack() {
+//     callBack = () => {};
+// }
 
 // 重新连接websocker(WebSocket连接地址)
 function ws_recontent(url) {
@@ -149,6 +154,6 @@ export {
     chessboard,
     user2,
     roomowner,
-    registerCallBack,
-    unregisterCallBack
+    // registerCallBack,
+    // unregisterCallBack
 }

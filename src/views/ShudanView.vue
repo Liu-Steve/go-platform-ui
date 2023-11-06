@@ -8,10 +8,15 @@
 
         <div class="user">
             <el-row>
+                <el-col>
+                    房间ID：   {{ roomId }}  
+                </el-col>
+            </el-row>
+            <el-row>
                 <el-col :span="12">
                     <img :src="blackUrl" class="stone">
                     <!-- todo:userid -->
-                    <span style="font-size: large;">用户1</span>
+                    <span style="font-size: large;">{{ blackPlayer.name }}</span>
                     <el-icon v-show="player_is_black">
                         <CaretLeft />
                     </el-icon>
@@ -19,7 +24,7 @@
                 <el-col :span="12">
                     <img :src="whiteUrl" class="stone">
                     <!-- todo:userid -->
-                    <span style="font-size: large;">用户2</span>
+                    <span style="font-size: large;">{{whitePlayer.name}}</span>
                     <el-icon v-show="!player_is_black">
                         <CaretLeft />
                     </el-icon>
@@ -47,7 +52,7 @@
 
             <el-row>
                 <el-col :span="8">
-                    <el-button type="primary" @click="">开始新游戏</el-button>
+                    <el-button type="primary" @click="createGame">开始新游戏</el-button>
                 </el-col>
 
                 <el-col :span="6">
@@ -102,7 +107,7 @@ import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
 import { CaretLeft } from "@element-plus/icons-vue";
 import { ElMessage } from 'element-plus';
-import { chessboard, user2, roomowner, registerCallBack, unregisterCallBack } from '../net/websocket.js'
+import { chessboard, user2, roomowner, bus } from '../net/websocket.js'
 //import { router } from "../router"
 
 const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
@@ -150,6 +155,7 @@ export default {
             blackPlayer: roomowner,
             whitePlayer: user2,
             roomId: localStorage.getItem("roomid"),
+            changePlayers: false
             //todo
             // roomId,
             // username_Owner,
@@ -162,11 +168,30 @@ export default {
     },
 
     created() {
-        registerCallBack((roomowner, user2, chessboard) => {
-            this.blackPlayer.id = roomowner;
-            this.whitePlayer = user2;
-            //this.$forceUpdate();
-            //getCurrentInstance().ctx.$forceUpdate();
+        // registerCallBack((roomowner, user2, chessboard) => {
+        //     this.blackPlayer.id = roomowner; 
+        //     this.whitePlayer = user2;
+        // });
+        bus.on("websocket", e => {
+            // this.blackPlayer = 0;
+            // this.whitePlayer = 0;
+            // this.blackPlayer = e.roomowner;
+            // this.whitePlayer = e.user2;
+            if(!this.changePlayers){
+                Object.assign(this.whitePlayer, e.user2);
+                Object.assign(this.blackPlayer, e.roomowner);
+            }
+            let Cboard = new Array(19*19).fill(0);
+            for(let i=0;i<19;i++){
+                for(let j=0;j<19;j++){
+                    if(e.chessboard[i][j] == -1) Cboard[i*19+j] = 0;
+                    else if(e.chessboard[i][j] == 0) Cboard[i*19+j] = 1;
+                    else if(e.chessboard[i][j] == 1) Cboard[i*19+j] = -1;
+                }
+            }
+
+            this.signMap = Cboard
+            this.signMap = JSON.parse(JSON.stringify(rawSignMap));
         });
     },
 
@@ -176,8 +201,14 @@ export default {
                 rawSignMap[offset] = cur_player.value;
                 cur_player.value = -cur_player.value;
                 this.player_is_black = cur_player.value === 1 ? true : false;
-                this.signMap = JSON.parse(JSON.stringify(rawSignMap));
             }
+            
+            let x = parseInt(offset/19);
+            let y = parseInt(offset - 19 * x);
+            
+            // this.signMap = JSON.parse(JSON.stringify(rawSignMap));
+            post("/api/chessBoard/drops/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"), {"dropPosition": [y, x]},
+            (message)=>{});
         },
         onReset: function () {
             rawSignMap = new Array(19 * 19).fill(0);
@@ -194,9 +225,10 @@ export default {
             let tmp = this.blackPlayer;
             this.blackPlayer = this.whitePlayer;
             this.whitePlayer = tmp;
+            this.changePlayers = !this.changePlayers;
         },
         createGame: function () {
-            post("/api/userId1/" + localStorage.getItem("userid") + localStorage.getItem("roomid"),
+            post("/api/chessBoard/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
                 { whitePlayerId: this.whitePlayer.id, blackPlayerId: this.blackPlayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
         }
@@ -233,7 +265,7 @@ export default {
     },
 
     destroyed() {
-        unregisterCallBack();
+        // unregisterCallBack();
         // 销毁
         window.onresize = null;
     },
