@@ -1,19 +1,31 @@
 <template>
-    <div>
-        <div>
-            欢迎来到围棋平台
+    <div class="all">
+        <div class="title">
+            <h1 style="font-size: 48px;">
+                欢迎来到围棋平台
+            </h1>
         </div>
-        <div>
-            <!-- todo:退出登录 -->
-            <el-button @click="logout" type="danger" plain>退出登录</el-button>
 
-            <!-- <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button> -->
-            <el-button @click="createRoom" type="success" plain>创建房间</el-button>
-            <el-button @click="joinRoom" type="success" plain>加入房间</el-button>
 
-        </div>
-        <!-- 创建房间弹窗 -->
+        <el-row style="text-align: center;">
+            <el-col>
+                <el-button @click="createRoom" class="button" type="success" size="large" plain>创建房间</el-button>
+            </el-col>
+
+            <el-col>
+                <el-button @click="joinRoom" class="button" type="success" size="large" plain>加入房间</el-button>
+            </el-col>
+
+            <el-col>
+                <el-button @click="logout" class="button" type="danger" size="large" plain>退出登录</el-button>
+            </el-col>
+        </el-row>
+
+
+        <!-- <el-button @click="$router.push('/game')" type="success" plain>开始下棋</el-button> -->
+
         <div>
+            <!-- 创建房间弹窗 -->
             <el-dialog title="收货地址" v-model="createRoomDialogVisible.state">
                 <el-form :model="form">
                     <el-form-item label="活动名称" :label-width="formLabelWidth">
@@ -32,7 +44,6 @@
                 </div>
             </el-dialog>
         </div>
-
     </div>
 </template>
 
@@ -54,24 +65,24 @@ const logout = () => {
     router.push('/')
 }
 
-let createRoomDialogVisible = reactive({state: false});
+let createRoomDialogVisible = reactive({ state: false });
 let form = reactive({
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-    })
+    name: '',
+    region: '',
+    date1: '',
+    date2: '',
+    delivery: false,
+    type: [],
+    resource: '',
+    desc: ''
+})
 
 const createRoom = () => {
-    put('/api/room/' + localStorage.getItem("userid"), {}, 
-    (message) => {
-    ElMessage.success('创建成功!');
-    router.push('/game');
-    })
+    put('/api/room/' + localStorage.getItem("userid"), {},
+        (message) => {
+            ElMessage.success('创建成功!');
+            router.push('/game');
+        })
 }
 
 const joinRoom = () => {
@@ -80,4 +91,24 @@ const joinRoom = () => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.all {
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    top: 20%;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.title {
+    text-align: center;
+}
+
+.button {
+    margin-top: 10px;
+    text-align: center;
+
+}
+</style>
