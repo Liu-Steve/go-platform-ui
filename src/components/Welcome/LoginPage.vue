@@ -47,8 +47,9 @@
 <script setup>
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive } from "vue";
-import { get, post } from '../../net';
-import { useRouter } from 'vue-router'
+import { ws, ws_create } from '../../net/websocket';
+import { get, post } from '../../net/index';
+import { useRouter } from 'vue-router';
 import axios from "axios";
 import { getRowIdentity } from 'element-plus/es/components/table/src/util';
 
@@ -60,8 +61,9 @@ const form = reactive({
     "remembered": false,
 })
 
-// form.username = localStorage.getItem("username");
-// form.password = localStorage.getItem("password");
+//持久化账号密码
+form.username = localStorage.getItem("username");
+form.password = localStorage.getItem("password");
 
 const login = () => {
     if (!form.username || !form.password) {
@@ -73,20 +75,23 @@ const login = () => {
             "password": form.password,
         }, (message) => {
             ElMessage.success('登陆成功!')
+            localStorage.setItem('username', form.username);
+            localStorage.setItem("userid", message.result.user.id)
             if (form.remembered) {
-                // localStorage.setItem('username', form.username);
-                // localStorage.setItem('password', form.password); 
-                // localStorage.setItem("remembered", form.remembered)   // 持久化
+                localStorage.setItem('password', form.password); 
+                localStorage.setItem("remembered", form.remembered)   // 持久化
             }
             axios.defaults.headers.common['Authorization'] = `Bearer ${message.result.token}`;
-            localStorage.setItem("userid", message.result.user.id)
             //localStorage.setItem("wstoken", message.result.token)
-
+            let url = "wss://dragondj.space/ws?Authorization=" + message.result.token;
+            ws_create(url)
+            //let ws = new WebSocket(url)
             router.push('/index')
         }
         )
     }
 }
+
 </script>
 
 <style scoped></style>

@@ -26,7 +26,7 @@
 
         <div>
             <!-- 创建房间弹窗 -->
-            <el-dialog title="收货地址" v-model="createRoomDialogVisible.state">
+            <el-dialog title="收货地址" v-model="joinRoomDialogVisible.state">
                 <el-form :model="form">
                     <el-form-item label="活动名称" :label-width="formLabelWidth">
                         <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -65,7 +65,7 @@ const logout = () => {
     router.push('/')
 }
 
-let createRoomDialogVisible = reactive({ state: false });
+let joinRoomDialogVisible = reactive({ state: false });
 let form = reactive({
     name: '',
     region: '',
@@ -80,13 +80,14 @@ let form = reactive({
 const createRoom = () => {
     put('/api/room/' + localStorage.getItem("userid"), {},
         (message) => {
+            localStorage.setItem("roomid", message.result.roomId);
             ElMessage.success('创建成功!');
             router.push('/game');
         })
 }
 
 const joinRoom = () => {
-    createRoomDialogVisible.state = true;
+    joinRoomDialogVisible.state = true;
 }
 
 </script>

@@ -48,7 +48,7 @@
                 </el-col>
 
                 <el-col :span="6">
-                    <el-button type="danger" @click="">退出房间</el-button>
+                    <el-button type="danger" @click="exitRoom">退出房间</el-button>
                 </el-col>
             </el-row>
 
@@ -58,19 +58,18 @@
 
 </template>
 
-<script setup>
-import { ref } from "vue"
+<script>
+import Goban from '../components/Shudan/Goban.vue';
+import { ref } from "vue";
+import { get } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
 import { CaretLeft } from "@element-plus/icons-vue";
+import { ElMessage } from 'element-plus';
+//import { router } from "../router"
 
 const blackUrl = ref(black);
 const whiteUrl = ref(white);
-</script>
-
-<script>
-import Goban from '@/components/Shudan/Goban.vue';
-import { ref, reactive } from "vue"
 
 const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
@@ -117,6 +116,11 @@ export default {
             this.signMap = JSON.parse(JSON.stringify(rawSignMap));
             cur_player.value = 1;
             player_is_black.value = true;
+        },
+        exitRoom: function() {
+            get("/api/room/exit/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
+             ()=>{ElMessage.success("返回成功")});
+            this.$router.push('/index');
         }
     },
 
