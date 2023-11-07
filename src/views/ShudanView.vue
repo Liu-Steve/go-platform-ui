@@ -9,7 +9,7 @@
         <div class="user">
             <el-row>
                 <el-col>
-                    房间ID：   {{ roomId }}  
+                    房间ID： {{ roomId }}
                 </el-col>
             </el-row>
             <el-row>
@@ -24,7 +24,7 @@
                 <el-col :span="12">
                     <img :src="whiteUrl" class="stone">
                     <!-- todo:userid -->
-                    <span style="font-size: large;">{{whitePlayer.name}}</span>
+                    <span style="font-size: large;">{{ whitePlayer.name }}</span>
                     <el-icon v-show="!player_is_black">
                         <CaretLeft />
                     </el-icon>
@@ -62,46 +62,46 @@
 
         </div>
 
-        <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false" :key="Math.random()">
-        <div style="text-align: center;">
-            <el-row>
-                <el-col>
-                    房间ID：   {{ roomId }}
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col>
-                    <img :src="blackUrl" class="stone">
-                    <span style="font-size: large;">{{ blackPlayer.name }}</span>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col>
-                    <img :src="whiteUrl" class="stone">
-                    <span style="font-size: large;">{{ whitePlayer.name }}</span>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col>
-                    <el-button type="warning" @click="changePlayer">切换黑白方</el-button>
-                </el-col>
-            </el-row>
-        </div>
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="showDialog = false">取 消</el-button>
-            <el-button type="primary" @click="createGame">确 定</el-button>
-        </div>
-    </el-dialog>
+        <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false"
+            :close-on-press-escape="false" :show-close="false" :key="Math.random()">
+            <div style="text-align: center;">
+                <el-row>
+                    <el-col>
+                        房间ID： {{ roomId }}
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <img :src="blackUrl" class="stone">
+                        <span style="font-size: large;">{{ blackPlayer.name }}</span>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <img :src="whiteUrl" class="stone">
+                        <span style="font-size: large;">{{ whitePlayer.name }}</span>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
+                        <el-button type="warning" @click="tmpUpdate">刷新</el-button>
+                    </el-col>
+                </el-row>
+            </div>
+            <div slot="footer" class="dialog-footer" style="text-align: right;">
+                <!-- <el-button @click="showDialog = false">取 消</el-button> -->
+                <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 
     <!-- 创建棋局弹窗 -->
-    
 </template>
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
-import { ref, reactive, getCurrentInstance, VueElement} from "vue";
+import { ref, reactive, getCurrentInstance, VueElement } from "vue";
 import { get, post } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
@@ -155,7 +155,9 @@ export default {
             blackPlayer: roomowner,
             whitePlayer: user2,
             roomId: localStorage.getItem("roomid"),
-            changePlayers: false
+            changePlayers: false,
+
+            isOwner: roomowner.id == localStorage.getItem("userid"),
             //todo
             // roomId,
             // username_Owner,
@@ -177,38 +179,38 @@ export default {
             // this.whitePlayer = 0;
             // this.blackPlayer = e.roomowner;
             // this.whitePlayer = e.user2;
-            if(!this.changePlayers){
+            if (!this.changePlayers) {
                 Object.assign(this.whitePlayer, e.user2);
                 Object.assign(this.blackPlayer, e.roomowner);
             }
-            let Cboard = new Array(19*19).fill(0);
-            for(let i=0;i<19;i++){
-                for(let j=0;j<19;j++){
-                    if(e.chessboard[i][j] == -1) Cboard[i*19+j] = 0;
-                    else if(e.chessboard[i][j] == 0) Cboard[i*19+j] = 1;
-                    else if(e.chessboard[i][j] == 1) Cboard[i*19+j] = -1;
+            let Cboard = new Array(19 * 19).fill(0);
+            for (let i = 0; i < 19; i++) {
+                for (let j = 0; j < 19; j++) {
+                    if (e.chessboard[i][j] === -1) Cboard[i * 19 + j] = 0;
+                    else if (e.chessboard[i][j] === 0) Cboard[i * 19 + j] = 1;
+                    else if (e.chessboard[i][j] === 1) Cboard[i * 19 + j] = -1;
                 }
             }
 
-            this.signMap = Cboard
+            this.rawSignMap = Cboard
             this.signMap = JSON.parse(JSON.stringify(rawSignMap));
         });
     },
 
     methods: {
         onVertexClick: function (offset) {
-            if (rawSignMap[offset] == 0) {
+            if (rawSignMap[offset] === 0) {
                 rawSignMap[offset] = cur_player.value;
-                cur_player.value = -cur_player.value;
-                this.player_is_black = cur_player.value === 1 ? true : false;
+                // cur_player.value = -cur_player.value;
+                this.player_is_black = !this.player_is_black;
             }
-            
-            let x = parseInt(offset/19);
+
+            let x = parseInt(offset / 19);
             let y = parseInt(offset - 19 * x);
-            
+
             // this.signMap = JSON.parse(JSON.stringify(rawSignMap));
-            post("/api/chessBoard/drops/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"), {"dropPosition": [y, x]},
-            (message)=>{});
+            post("/api/chessBoard/drops/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"), { "dropPosition": [y, x] },
+                (message) => { });
         },
         onReset: function () {
             rawSignMap = new Array(19 * 19).fill(0);
@@ -227,6 +229,13 @@ export default {
             this.whitePlayer = tmp;
             this.changePlayers = !this.changePlayers;
         },
+        tmpUpdate: function () {
+            console.log(roomowner.id);
+            console.log(localStorage.getItem("userid"));
+            console.log(roomowner.id == localStorage.getItem("userid"))
+
+            this.$forceUpdate();
+        },
         createGame: function () {
             post("/api/chessBoard/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
                 { whitePlayerId: this.whitePlayer.id, blackPlayerId: this.blackPlayer.id, boardSize: 19, timeToDrop: 60 },
@@ -240,7 +249,7 @@ export default {
                 { stateKey: 'showCoordinates', text: 'Show coordinates' },
                 { stateKey: 'isBusy', text: 'Busy' }
             ];
-        }
+        },
     },
 
     watch: {

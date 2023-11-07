@@ -13,7 +13,8 @@
             </el-col>
 
             <el-col>
-                <el-button @click="joinRoomDialogVisible.state = true" class="button" type="success" size="large" plain>加入房间</el-button>
+                <el-button @click="joinRoomDialogVisible.state = true" class="button" type="success" size="large"
+                    plain>加入房间</el-button>
             </el-col>
 
             <el-col>
