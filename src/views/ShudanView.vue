@@ -90,7 +90,7 @@
                 </el-row>
             </div>
             <div slot="footer" class="dialog-footer" style="text-align: right;">
-                <!-- <el-button @click="showDialog = false">取 消</el-button> -->
+                <el-button @click="exitRoom">取 消</el-button>
                 <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
             </div>
         </el-dialog>
@@ -240,6 +240,7 @@ export default {
             post("/api/chessBoard/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"),
                 { whitePlayerId: this.whitePlayer.id, blackPlayerId: this.blackPlayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
+            this.showDialog = false;
         }
     },
 
@@ -268,7 +269,7 @@ export default {
         //窗口尺寸改变
         window.onresize = () => {
             return (() => {
-                this.$router.go(0);
+                // this.$router.go(0);
             })();
         };
     },
