@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import axios from "axios";
+import { useRoomStore } from '../stores/RoomInformation.js'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
       ]
     },
     {
+      path: '/homepage',
+      name: 'homepage',
+      component: () => import('@/views/HomePageView.vue')
+    },
+    {
       path: '/index',
       name: 'index',
       component: () => import('@/views/IndexView.vue')
@@ -39,16 +45,22 @@ const router = createRouter({
  * 全局前置路由守卫，每一次路由跳转前都进入这个 beforeEach 函数
  */
 router.beforeEach((to, from, next) => {
+  // 获取 token
+  const token = localStorage.getItem('Authorization');
+  const token2 = axios.defaults.headers.common['Authorization']
+
+  let isLogin = !((token === null || token === '' || token === undefined) && (token2 === null || token2 === '' || token2 === undefined)) && useRoomStore().ws_state
+  // console.log(token)
+  // console.log(token2)
+  // console.log(isLogin)
+
   if (to.path === '/' || to.path === '/register') {
-    // 登录或者注册才可以往下进行
-    next();
+
+    if (isLogin) next('/homepage')
+    else next();
   } else {
-    // 获取 token
-    const token = localStorage.getItem('Authorization');
-    const token2 = axios.defaults.headers.common['Authorization']
     // token 不存在
-    if ((token === null || token === '') && (token2 === null || token2 === '')) {
-      ElMessage.error('您还没有登录，请先登录');
+    if (!isLogin) {
       next('/');
     } else {
       next();
