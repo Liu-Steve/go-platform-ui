@@ -69,9 +69,9 @@ function ws_event(ws, url) {
 		  // 处理数据
           let data = JSON.parse(event.data);
 
+          let Cboard = Array(19 * 19).fill(0)
           if(data.mode === 0 || data.mode === 1 || data.mode === 2 || data.mode === 3 || data.mode === 4){
             let chessboard = data.message.board;
-            let Cboard = Array(19 * 19).fill(0)
   
               for (let i = 0; i < 19; i++) {
                   for (let j = 0; j < 19; j++) {
@@ -116,8 +116,8 @@ function ws_event(ws, url) {
             case 11://ROOM_EXIT;
             room.roomplayer.id = "";
             room.roomplayer.name = "";
-            room.roomowner.id = userid;
-            room.roomowner.name = username;
+            room.roomowner.id = room.userid;
+            room.roomowner.name = room.username;
             break;
           }
             // callBack(roomowner, user2, chessboard);

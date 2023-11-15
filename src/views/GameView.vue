@@ -1,103 +1,129 @@
 <template>
-    <div class="box">
-        <div class="board">
-            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" :animate="isAnimate" :busy="isBusy"
-                :coord-x="chineseCoordx" :coord-y="chineseCoordy" :show-coordinates="showCoordinates" @click="onVertexClick"
+    <div style="width: 100vw;height:100vh;overflow:hidden;display: flex;background-color: antiquewhite;" ref="box">
+        <!-- 左边棋盘 -->
+        <div style="flex:1;">
+            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" @click="onVertexClick"
                 style="text-align: center;" />
         </div>
 
-        <div class="user">
-            <el-row>
+        <!-- 右边菜单 -->
+        <div style="width:450px;margin-right: 15px;">
+            <!-- 第一行，显示房间号的卡片 -->
+            <el-row style="margin-top: 30px;">
                 <el-col>
-                    房间ID： {{ roomId }}
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            房间ID： {{ roomId }}
+                        </el-text>
+                    </el-card>
                 </el-col>
             </el-row>
-            <el-row>
+
+            <!-- 第二行，显示当前黑白棋的卡片 -->
+            <el-row :gutter="20" style="margin-top: 20px;">
                 <el-col :span="12">
-                    <img :src="blackUrl" class="stone">
-                    <!-- todo:userid -->
-                    <span style="font-size: large;">{{ blackPlayer.name }}</span>
-                    <el-icon v-show="player_is_black">
-                        <CaretLeft />
-                    </el-icon>
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            <img :src="blackUrl" class="stone">
+                            <!-- todo:userid -->
+                            <span>{{ " " + blackPlayer.name }}</span>
+                            <el-icon v-show="player_is_black">
+                                <CaretLeft />
+                            </el-icon>
+                        </el-text>
+                    </el-card>
                 </el-col>
                 <el-col :span="12">
-                    <img :src="whiteUrl" class="stone">
-                    <!-- todo:userid -->
-                    <span style="font-size: large;">{{ whitePlayer.name }}</span>
-                    <el-icon v-show="!player_is_black">
-                        <CaretLeft />
-                    </el-icon>
-                </el-col>
-
-            </el-row>
-
-            <el-row>
-                <el-col :span="8">
-                    <el-button type="warning" @click="onReset">重置棋盘</el-button>
-                </el-col>
-                <el-col :span="8">
-                    <el-button type="warning" @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            <img :src="whiteUrl" class="stone">
+                            <!-- todo:userid -->
+                            <span>{{ " " + whitePlayer.name }}</span>
+                            <el-icon v-show="!player_is_black">
+                                <CaretLeft />
+                            </el-icon>
+                        </el-text>
+                    </el-card>
                 </el-col>
             </el-row>
 
-            <el-row>
-                <el-col :span="6">
-                    <el-button type="success" @click="">停一手</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" @click="">认输</el-button>
+            <!-- 第三行，按钮卡片 -->
+            <el-row style="margin-top: 20px;">
+                <el-col>
+                    <el-card class="card">
+                        <el-row>
+                            <el-col :span="8">
+                                <el-button type="warning" @click="onReset">重置棋盘</el-button>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-button type="warning"
+                                    @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
+                            </el-col>
+                        </el-row>
+
+                        <el-row style="margin-top: 10px;">
+                            <el-col :span="6">
+                                <el-button type="success" @click="">停一手</el-button>
+                            </el-col>
+                            <el-col :span="6">
+                                <el-button type="warning" @click="">认输</el-button>
+                            </el-col>
+                        </el-row>
+
+                        <el-row style="margin-top: 10px;">
+                            <el-col :span="8">
+                                <el-button type="primary" @click="createGame">开始新游戏</el-button>
+                            </el-col>
+
+                            <el-col :span="6">
+                                <el-button type="danger" @click="exitRoom">退出房间</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+
                 </el-col>
             </el-row>
-
-            <el-row>
-                <el-col :span="8">
-                    <el-button type="primary" @click="createGame">开始新游戏</el-button>
-                </el-col>
-
-                <el-col :span="6">
-                    <el-button type="danger" @click="exitRoom">退出房间</el-button>
-                </el-col>
-            </el-row>
-
         </div>
-
-        <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false"
-            :close-on-press-escape="false" :show-close="false" :key="Math.random()">
-            <div style="text-align: center;">
-                <el-row>
-                    <el-col>
-                        房间ID： {{ roomId }}
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <img :src="blackUrl" class="stone">
-                        <span style="font-size: large;">{{ blackPlayer.name }}</span>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <img :src="whiteUrl" class="stone">
-                        <span style="font-size: large;">{{ whitePlayer.name }}</span>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
-                        <el-button type="warning" @click="tmpUpdate">刷新</el-button>
-                    </el-col>
-                </el-row>
-            </div>
-            <div slot="footer" class="dialog-footer" style="text-align: right;">
-                <!-- <el-button @click="showDialog = false">取 消</el-button> -->
-                <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
-            </div>
-        </el-dialog>
     </div>
 
     <!-- 创建棋局弹窗 -->
+    <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false" :key="Math.random()">
+        <div style="text-align: center;">
+            <el-row>
+                <el-col>
+                    <el-text style="font-size: large;">房间ID： {{ roomId }}</el-text>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <el-text>
+                        <img :src="blackUrl" class="stone">
+                        <span style="font-size: large;">{{ " " + blackPlayer.name }}</span>
+                    </el-text>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <el-text>
+                        <img :src="whiteUrl" class="stone">
+                        <span style="font-size: large;">{{ " " + whitePlayer.name }}</span>
+                    </el-text>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
+                </el-col>
+            </el-row>
+        </div>
+        <div slot="footer" class="dialog-footer" style="text-align: right;">
+            <el-button @click="exitRoom">取 消</el-button>
+            <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
+        </div>
+    </el-dialog>
 </template>
+
 
 <script>
 import Goban from '../components/Shudan/Goban.vue';
@@ -110,12 +136,6 @@ import { ElMessage } from 'element-plus';
 import { useRoomStore } from '../stores/roomInformation';
 import { storeToRefs } from 'pinia'
 //import { router } from "../router"
-
-const chineseCoordx = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
-const chineseCoordy = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-const windowInnerWidth = document.documentElement.clientWidth;
-const windowInnerHeight = document.documentElement.clientHeight;
-
 
 let rawSignMap = new Array(19 * 19).fill(0);
 let cur_player = ref(1);
@@ -141,7 +161,7 @@ export default {
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
-            maxSize: Math.min(windowInnerWidth, windowInnerHeight),
+            maxSize: 0,
             showCoordinates: false,
             isBusy: false,
             isAnimate: false,
@@ -151,9 +171,7 @@ export default {
             blackUrl: black,
             whiteUrl: white,
 
-            rawSignMap : storeToRefs(room).chessboard,
-            chineseCoordx,
-            chineseCoordy,
+            rawSignMap: storeToRefs(room).chessboard,
 
             blackPlayer: storeToRefs(room).blackplayer,
             whitePlayer: storeToRefs(room).whiteplayer,
@@ -240,14 +258,6 @@ export default {
             room.whiteplayer = tmp
             this.changePlayers = !this.changePlayers;
         },
-        tmpUpdate: function () {
-            // console.log(room.roomid);
-            // console.log(this.roomId);
-             console.log(room.blackplayername);
-            console.log(room.currentcolor);
-
-            this.$forceUpdate();
-        },
         createGame: function () {
             post("/api/chessBoard/" + room.userid + "/" + room.roomid,
                 { whitePlayerId: room.whiteplayer.id, blackPlayerId: room.blackplayer.id, boardSize: 19, timeToDrop: 60 },
@@ -277,18 +287,10 @@ export default {
     },
 
     mounted() {
-        //窗口尺寸改变
-        window.onresize = () => {
-            return (() => {
-                this.$router.go(0);
-            })();
-        };
+        this.maxSize = Math.min(this.$refs.box.offsetWidth, this.$refs.box.offsetHeight);
     },
 
     destroyed() {
-        // unregisterCallBack();
-        // 销毁
-        window.onresize = null;
     },
 };
 </script>

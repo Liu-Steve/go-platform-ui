@@ -19,7 +19,7 @@
             <el-row style="margin-top: 10px;">
                 <el-col style="text-align: center;">
                     <el-text size="large">
-                        您好,XXX
+                        您好,{{ form.username }}
                         <el-button @click="logout" class="button" type="danger" plain>
                             退出登录
                         </el-button>
@@ -73,6 +73,7 @@ import { reactive } from "vue";
 import { get, post, put } from '../net';
 import { useRoomStore } from "../stores/RoomInformation.js"
 import { ws, ws_close } from "../net/websocket"
+import { storeToRefs } from 'pinia'
 import background from '../assets/img/test.jpg'
 import home_img from '../assets/img/home.png'
 import plus_img from '../assets/img/add.png'
@@ -92,6 +93,7 @@ const logout = () => {
 let joinRoomDialogVisible = reactive({ state: false });
 let form = reactive({
     roomid: '',
+    username: storeToRefs(room).username
 })
 
 const createRoom = () => {
