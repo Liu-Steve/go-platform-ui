@@ -1,102 +1,124 @@
 <template>
-    <div class="box">
-        <div class="board">
-            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" :animate="isAnimate" :busy="isBusy"
-                :coord-x="chineseCoordx" :coord-y="chineseCoordy" :show-coordinates="showCoordinates" @click="onVertexClick"
+    <div style="width: 100vw;height:100vh;overflow:hidden;display: flex;background-color: antiquewhite;" ref="box">
+        <!-- 左边棋盘 -->
+        <div style="flex:1;">
+            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" @click="onVertexClick"
                 style="text-align: center;" />
         </div>
 
-        <div class="user">
+        <!-- 右边菜单 -->
+        <div style="width:450px;margin-right: 15px;">
+            <!-- 第一行，显示房间号的卡片 -->
+            <el-row style="margin-top: 30px;">
+                <el-col>
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            房间ID： {{ roomId }}
+                        </el-text>
+                    </el-card>
+                </el-col>
+            </el-row>
+
+            <!-- 第二行，显示当前黑白棋的卡片 -->
+            <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="12">
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            <img :src="blackUrl" class="stone">
+                            <!-- todo:userid -->
+                            <span>黑棋用户名</span>
+                            <el-icon v-show="player_is_black">
+                                <CaretLeft />
+                            </el-icon>
+                        </el-text>
+                    </el-card>
+                </el-col>
+                <el-col :span="12">
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            <img :src="whiteUrl" class="stone">
+                            <!-- todo:userid -->
+                            <span>白棋用户名</span>
+                            <el-icon v-show="!player_is_black">
+                                <CaretLeft />
+                            </el-icon>
+                        </el-text>
+                    </el-card>
+                </el-col>
+            </el-row>
+
+            <!-- 第三行，按钮卡片 -->
+            <el-row style="margin-top: 20px;">
+                <el-col>
+                    <el-card class="card">
+                        <el-row>
+                            <el-col :span="8">
+                                <el-button type="warning" @click="onReset">重置棋盘</el-button>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-button type="warning"
+                                    @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
+                            </el-col>
+                        </el-row>
+
+                        <el-row style="margin-top: 10px;">
+                            <el-col :span="6">
+                                <el-button type="success" @click="">停一手</el-button>
+                            </el-col>
+                            <el-col :span="6">
+                                <el-button type="warning" @click="">认输</el-button>
+                            </el-col>
+                        </el-row>
+
+                        <el-row style="margin-top: 10px;">
+                            <el-col :span="8">
+                                <el-button type="primary" @click="createGame">开始新游戏</el-button>
+                            </el-col>
+
+                            <el-col :span="6">
+                                <el-button type="danger" @click="exitRoom">退出房间</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+
+    <!-- 创建棋局弹窗 -->
+    <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false" :key="Math.random()">
+        <div style="text-align: center;">
             <el-row>
                 <el-col>
                     房间ID： {{ roomId }}
                 </el-col>
             </el-row>
             <el-row>
-                <el-col :span="12">
+                <el-col>
                     <img :src="blackUrl" class="stone">
-                    <!-- todo:userid -->
                     <span style="font-size: large;">{{ blackPlayer.name }}</span>
-                    <el-icon v-show="player_is_black">
-                        <CaretLeft />
-                    </el-icon>
                 </el-col>
-                <el-col :span="12">
+            </el-row>
+            <el-row>
+                <el-col>
                     <img :src="whiteUrl" class="stone">
-                    <!-- todo:userid -->
                     <span style="font-size: large;">{{ whitePlayer.name }}</span>
-                    <el-icon v-show="!player_is_black">
-                        <CaretLeft />
-                    </el-icon>
                 </el-col>
-
             </el-row>
-
             <el-row>
-                <el-col :span="8">
-                    <el-button type="warning" @click="onReset">重置棋盘</el-button>
-                </el-col>
-                <el-col :span="8">
-                    <el-button type="warning" @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
+                <el-col>
+                    <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
+                    <el-button type="warning" @click="tmpUpdate">刷新</el-button>
                 </el-col>
             </el-row>
-
-            <el-row>
-                <el-col :span="6">
-                    <el-button type="success" @click="">停一手</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" @click="">认输</el-button>
-                </el-col>
-            </el-row>
-
-            <el-row>
-                <el-col :span="8">
-                    <el-button type="primary" @click="createGame">开始新游戏</el-button>
-                </el-col>
-
-                <el-col :span="6">
-                    <el-button type="danger" @click="exitRoom">退出房间</el-button>
-                </el-col>
-            </el-row>
-
         </div>
-
-        <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false"
-            :close-on-press-escape="false" :show-close="false" :key="Math.random()">
-            <div style="text-align: center;">
-                <el-row>
-                    <el-col>
-                        房间ID： {{ roomId }}
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <img :src="blackUrl" class="stone">
-                        <span style="font-size: large;">{{ blackPlayer.name }}</span>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <img :src="whiteUrl" class="stone">
-                        <span style="font-size: large;">{{ whitePlayer.name }}</span>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
-                        <el-button type="warning" @click="tmpUpdate">刷新</el-button>
-                    </el-col>
-                </el-row>
-            </div>
-            <div slot="footer" class="dialog-footer" style="text-align: right;">
-                <el-button @click="exitRoom">取 消</el-button>
-                <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
-            </div>
-        </el-dialog>
-    </div>
-
-    <!-- 创建棋局弹窗 -->
+        <div slot="footer" class="dialog-footer" style="text-align: right;">
+            <el-button @click="exitRoom">取 消</el-button>
+            <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
+        </div>
+    </el-dialog>
 </template>
 
 <script>
@@ -119,6 +141,8 @@ const windowInnerHeight = document.documentElement.clientHeight;
 let rawSignMap = new Array(19 * 19).fill(0);
 let cur_player = ref(1);
 
+
+
 export default {
     name: 'Shudan',
 
@@ -139,6 +163,7 @@ export default {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
             maxSize: Math.min(windowInnerWidth, windowInnerHeight),
+            // maxSize: ,
             showCoordinates: false,
             isBusy: false,
             isAnimate: false,
@@ -174,6 +199,10 @@ export default {
         //     this.blackPlayer.id = roomowner; 
         //     this.whitePlayer = user2;
         // });
+        // console.log(this.$refs.box)
+        // console.log(screen_height)
+
+
         bus.on("websocket", e => {
             // this.blackPlayer = 0;
             // this.whitePlayer = 0;
@@ -266,6 +295,9 @@ export default {
     },
 
     mounted() {
+        this.maxSize = Math.min(this.$refs.box.offsetWidth, this.$refs.box.offsetHeight);
+        console.log(this.$refs.box.offsetWidth)
+        console.log(this.$refs.box.offsetHeight)
         //窗口尺寸改变
         window.onresize = () => {
             return (() => {
@@ -284,26 +316,15 @@ export default {
 
 
 <style scope>
-.box {
+.card {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: row;
-    background-color: antiquewhite;
-}
-
-.board {
-    flex: 7;
-}
-
-.user {
-    flex: 3;
-    /* text-align: center; */
-    margin-top: 60px;
-}
-
-.el-row {
-    margin-bottom: 20px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 10px;
 }
 
 .stone {

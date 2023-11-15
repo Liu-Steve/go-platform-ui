@@ -1,5 +1,5 @@
 .shudan-goban {
-    /* --shudan-board-border-width: .25em; */
+    --shudan-board-border-width: .25em;
     --shudan-board-border-color: #CA933A;
 
     --shudan-board-background-color: #EBB55B;
