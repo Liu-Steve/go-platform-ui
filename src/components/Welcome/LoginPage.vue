@@ -89,10 +89,15 @@ const login = () => {
                 localStorage.setItem('username', '');
                 localStorage.setItem("userid", '')
                 localStorage.setItem('password', ''); 
-                localStorage.setItem("remembered", 'false')   // 持久化
+                localStorage.setItem("remembered", 'false')   // 取消持久化
             }
+            //持久化用户的token
             axios.defaults.headers.common['Authorization'] = `Bearer ${message.result.token}`;
             localStorage.setItem("Authorization", message.result.token)
+
+            //纪录用户信息
+            room.userid = message.result.user.id
+            room.username = form.username
 
             //建立websocket连接
             let url = "wss://dragondj.space/ws?Authorization=" + message.result.token;

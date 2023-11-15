@@ -1,6 +1,6 @@
 import { get } from '../net/index.js';
 import mitt from 'mitt';
-import { useRoomStore } from '../stores/RoomInformation.js'
+import { useRoomStore } from '../stores/roomInformation.js'
 
 export const bus = mitt();
 
@@ -37,9 +37,7 @@ function ws_close(){
     ws_heartCheck.reset()
 }
 
-let chessboard = new Array(19).fill(Array(19).fill(-1));
-let user2 = {id: "", name: ""};
-let roomowner = {id: "", name: ""};
+
 // let callBack = () => {};
 
 // WebSocket 事件创建
@@ -71,40 +69,59 @@ function ws_event(ws, url) {
 		  // 处理数据
           let data = JSON.parse(event.data);
 
+          if(data.mode === 0 || data.mode === 1 || data.mode === 2 || data.mode === 3 || data.mode === 4){
+            let chessboard = data.message.board;
+            let Cboard = Array(19 * 19).fill(0)
+  
+              for (let i = 0; i < 19; i++) {
+                  for (let j = 0; j < 19; j++) {
+                      if (chessboard[i][j] === -1) Cboard[i * 19 + j] = 0;
+                      else if (chessboard[i][j] === 0) Cboard[i * 19 + j] = 1;
+                  else if (chessboard[i][j] === 1) Cboard[i * 19 + j] = -1;
+                  }
+              }
+          }
+
           switch(data.mode){
             case 0://CHESS_WAIT
-            chessboard = data.message.board;
+            room.chessboard = Cboard;
             break;
             case 1://CHESS_START
-            chessboard = data.message.board;
+            room.chessboard = Cboard;
             break;
             case 2://CHESS_STOP_ONCE
-            chessboard = data.message.board;
+            room.chessboard = Cboard;
             break;
             case 3://CHESS_STOP_ONCE_ANOTHER
-            chessboard = data.message.board;
+            room.chessboard = Cboard;
             break;
             case 4://CHESS_REQUEST_STOP
-            chessboard = data.message.board;
+            room.chessboard = Cboard;
             break;
             case 10://ROOM_ENTER
-            roomowner.id = data.message.createUserId
-            roomowner.name = data.message.createUserName;
-            user2.id = data.message.secondUserId;
-            user2.name = get("/api/user/" + user2.id, 
-                (message)=>{user2.name = message.result.username})
+            room.roomowner.id = data.message.createUserId
+            room.roomowner.name = data.message.createUserName;
+            room.roomplayer.id = data.message.secondUserId;
+            get("/api/user/" + room.roomplayer.id, 
+                (message)=>{room.roomplayer.name = message.result.username})
+            // if(room.currentcolor === 'white') {
+            //     room.blackplayername = room.roomplayer.name;
+            //     room.blackplayerid = room.roomplayer.id;
+            // }
+            // else {
+            //     room.whiteplayername = room.roomplayer.name;
+            //     room.whiteplayerid = room.roomplayer.id;
+            // }
             break;
             case 11://ROOM_EXIT;
-            user2.id = "";
-            user2.name = "";
-            roomowner.id = localStorage.getItem("userid");
-            roomowner.name = get("/api/user/" + roomowner.id, 
-            (message)=>{roomowner.name = message.result.username});
+            room.roomplayer.id = "";
+            room.roomplayer.name = "";
+            room.roomowner.id = userid;
+            room.roomowner.name = username;
             break;
           }
             // callBack(roomowner, user2, chessboard);
-            bus.emit("websocket", {roomowner: roomowner, user2: user2, chessboard: chessboard})
-
+            //bus.emit("websocket", {roomowner: roomowner, user2: user2, chessboard: chessboard})
 		}
 	};
 }
@@ -161,10 +178,5 @@ export {
     ws,
     ws_url,
     ws_create,
-    ws_close,
-    chessboard,
-    user2,
-    roomowner,
-    // registerCallBack,
-    // unregisterCallBack
+    ws_close
 }

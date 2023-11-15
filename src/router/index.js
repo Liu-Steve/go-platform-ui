@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import axios from "axios";
-import { useRoomStore } from '../stores/RoomInformation.js'
+import { useRoomStore } from '../stores/roomInformation'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -36,7 +36,8 @@ const router = createRouter({
     {
       path: '/game',
       name: 'game',
-      component: () => import("@/views/ShudanView.vue")
+      // component: () => import("@/views/ShudanView.vue")
+      component: () => import("@/views/GameView.vue")
     },
   ]
 })

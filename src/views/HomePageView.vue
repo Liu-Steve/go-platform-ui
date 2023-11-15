@@ -66,18 +66,31 @@ let form = reactive({
 })
 
 const createRoom = () => {
-    put('/api/room/' + localStorage.getItem("userid"), {},
+    put('/api/room/' + room.userid, {},
         (message) => {
-            localStorage.setItem("roomid", message.result.roomId);
-            roomowner.name = message.result.createUserName;
-            roomowner.id = message.result.createUserId;
+            room.roomid = message.result.roomId;
+            room.roomowner.name = message.result.createUserName;
+            room.roomowner.id = message.result.createUserId;
+            // room.roomplayer.name = ''
+            // room.roomplayer.id = ''
+            // room.blackplayerid = room.roomowner.id;
+            // room.blackplayername = room.roomowner.name;
             ElMessage.success('创建成功!');
             router.push('/game');
         })
 }
 
 const joinRoom = () => {
+    get("/api/room/enter/" + room.userid + "/" + form.roomid,
+        (message) => {
+            room.roomid = message.result.roomId
+            room.roomowner.id = message.result.createUserId;
+            room.roomowner.name = message.result.createUserName;
+            room.roomplayer.name = room.username
+            room.roomplayer.id = room.userid
 
+            router.push("/game");
+        })
 }
 
 </script>

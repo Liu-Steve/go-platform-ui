@@ -12,12 +12,20 @@ import { defineStore } from 'pinia'
 // })
 
 export const useRoomStore = defineStore('room', () => {
-  const roomid = 0
-  const user1id = 0
-  const user1name = ''
-  const user2id = 0
-  const user2name = ''
-  const ws_state = false
+  const roomid = ref(0)
+  const userid = ref(0)
+  const username = ref('')
+  const ws_state = ref(false)
+  const chessboard = ref(Array(19 * 19).fill(0));
+  const roomplayer = ref({id: "", name: ""});
+  const roomowner = ref({id: "", name: ""});
+  const blackplayer = ref(roomowner)
+  const whiteplayer = ref(roomplayer)
+  // const blackplayername = ref('')
+  // const blackplayerid = ref('')
+  // const whiteplayername = ref('')
+  // const whiteplayerid = ref('')
+  // const currentcolor = ref('black')
 
-  return { roomid, user1id, user1name, user2id, user2name, ws_state}
+  return { roomid, userid, username, ws_state, chessboard, roomplayer, roomowner, blackplayer, whiteplayer }
 })
