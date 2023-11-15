@@ -88,6 +88,7 @@ function ws_event(ws, url) {
             //当前方执白
             if(!room.gamestart){
                 room.gamestart = true;
+                room.showdialog = false;
                 if(room.blackplayer.id === room.userid) {
                     let tmp = room.whiteplayer;
                     room.whiteplayer = room.blackplayer;
@@ -100,6 +101,7 @@ function ws_event(ws, url) {
             //当前方执黑
             if(!room.gamestart){
                 room.gamestart = true;
+                room.showdialog = false;
                 if(room.whiteplayer.id === room.userid) {
                     let tmp = room.blackplayer;
                     room.blackplayer = room.whiteplayer;

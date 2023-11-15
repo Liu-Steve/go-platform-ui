@@ -53,7 +53,7 @@
                     <el-card class="card">
                         <el-row>
                             <el-col :span="8">
-                                <el-button type="warning" @click="onReset">重置棋盘</el-button>
+                                <el-button type="warning" @click="tmp">重置棋盘</el-button>
                             </el-col>
                             <el-col :span="8">
                                 <el-button type="warning"
@@ -163,14 +163,6 @@ export default {
         CaretLeft,
     },
 
-    // setup() {
-    //     let showDialog = reactive({ state: true });
-
-    //     return{
-    //         showDialog,
-    //     }
-    // },
-
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
@@ -179,7 +171,7 @@ export default {
             isBusy: false,
             isAnimate: false,
             player_is_black: true,
-            showDialog: true,
+            showDialog: storeToRefs(room).showdialog,
 
             blackUrl: black,
             whiteUrl: white,
@@ -243,7 +235,7 @@ export default {
             let y = parseInt(offset - 19 * x);
 
             // this.signMap = JSON.parse(JSON.stringify(rawSignMap));
-            post("/api/chessBoard/drops/" + localStorage.getItem("userid") + "/" + localStorage.getItem("roomid"), { "dropPosition": [y, x] },
+            post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
                 (message) => { });
         },
         onReset: function () {
