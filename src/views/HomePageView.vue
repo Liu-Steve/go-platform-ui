@@ -71,7 +71,7 @@ import axios from "axios";
 import { useRouter } from 'vue-router'
 import { reactive } from "vue";
 import { get, post, put } from '../net';
-import { useRoomStore } from "../stores/RoomInformation.js"
+import { useRoomStore } from "../stores/roomInformation.js"
 import { ws, ws_close } from "../net/websocket"
 import { storeToRefs } from 'pinia'
 import background from '../assets/img/test.jpg'
@@ -102,6 +102,7 @@ const createRoom = () => {
             room.roomid = message.result.roomId;
             room.roomowner.name = message.result.createUserName;
             room.roomowner.id = message.result.createUserId;
+            room.isowner = true;
             // room.roomplayer.name = ''
             // room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
@@ -119,7 +120,7 @@ const joinRoom = () => {
             room.roomowner.name = message.result.createUserName;
             room.roomplayer.name = room.username
             room.roomplayer.id = room.userid
-
+            room.isowner = false;
             router.push("/game");
         })
 }

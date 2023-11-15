@@ -85,9 +85,27 @@ function ws_event(ws, url) {
           switch(data.mode){
             case 0://CHESS_WAIT
             room.chessboard = Cboard;
+            //当前方执白
+            if(!room.gamestart){
+                room.gamestart = true;
+                if(room.blackplayer.id === room.userid) {
+                    let tmp = room.whiteplayer;
+                    room.whiteplayer = room.blackplayer;
+                    room.blackplayer = tmp;
+                }
+            }
             break;
             case 1://CHESS_START
             room.chessboard = Cboard;
+            //当前方执黑
+            if(!room.gamestart){
+                room.gamestart = true;
+                if(room.whiteplayer.id === room.userid) {
+                    let tmp = room.blackplayer;
+                    room.blackplayer = room.whiteplayer;
+                    room.whiteplayer = tmp;
+                }
+            }
             break;
             case 2://CHESS_STOP_ONCE
             room.chessboard = Cboard;
@@ -118,6 +136,7 @@ function ws_event(ws, url) {
             room.roomplayer.name = "";
             room.roomowner.id = room.userid;
             room.roomowner.name = room.username;
+            room.isowner = true;
             break;
           }
             // callBack(roomowner, user2, chessboard);

@@ -51,7 +51,7 @@ import { ws, ws_create } from '../../net/websocket';
 import { get, post } from '../../net/index';
 import { useRouter } from 'vue-router';
 import axios from "axios";
-import { useRoomStore } from '../../stores/RoomInformation'
+import { useRoomStore } from '../../stores/roomInformation'
 // import { getRowIdentity } from 'element-plus/es/components/table/src/util';
 
 const router = useRouter();

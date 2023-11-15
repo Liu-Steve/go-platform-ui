@@ -21,11 +21,13 @@ export const useRoomStore = defineStore('room', () => {
   const roomowner = ref({id: "", name: ""});
   const blackplayer = ref(roomowner)
   const whiteplayer = ref(roomplayer)
+  const gamestart = ref(false)
+  const isowner = ref(false)
   // const blackplayername = ref('')
   // const blackplayerid = ref('')
   // const whiteplayername = ref('')
   // const whiteplayerid = ref('')
   // const currentcolor = ref('black')
 
-  return { roomid, userid, username, ws_state, chessboard, roomplayer, roomowner, blackplayer, whiteplayer }
+  return { roomid, userid, username, ws_state, chessboard, roomplayer, roomowner, blackplayer, whiteplayer, gamestart, isowner }
 })

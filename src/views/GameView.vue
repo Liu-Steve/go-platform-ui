@@ -88,14 +88,14 @@
 
     <!-- 创建棋局弹窗 -->
     <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false" :key="Math.random()">
+        :show-close="false">
         <div style="text-align: center;">
-            <el-row>
+            <el-row v-show="isOwner">
                 <el-col>
                     <el-text style="font-size: large;">房间ID： {{ roomId }}</el-text>
                 </el-col>
             </el-row>
-            <el-row>
+            <el-row v-show="isOwner">
                 <el-col>
                     <el-text>
                         <img :src="blackUrl" class="stone">
@@ -103,7 +103,7 @@
                     </el-text>
                 </el-col>
             </el-row>
-            <el-row>
+            <el-row v-show="isOwner">
                 <el-col>
                     <el-text>
                         <img :src="whiteUrl" class="stone">
@@ -111,15 +111,28 @@
                     </el-text>
                 </el-col>
             </el-row>
-            <el-row>
+            <el-row v-show="isOwner">
                 <el-col>
-                    <el-button type="warning" @click="changePlayer" v-show="isOwner">切换黑白方</el-button>
+                    <el-button type="warning" @click="changePlayer">切换黑白方</el-button>
+                </el-col>
+            </el-row>
+            <!-- 另外一个用户的界面 -->
+            <el-row v-show="!isOwner">
+                <el-col>
+                    <el-text>
+                        等待房主开始游戏
+                    </el-text>
+                </el-col>
+            </el-row>
+            <el-row v-show="!isOwner">
+                <el-col>
+                    <el-button type="danger" @click="exitRoom">退出房间</el-button>
                 </el-col>
             </el-row>
         </div>
-        <div slot="footer" class="dialog-footer" style="text-align: right;">
+        <div slot="footer" class="dialog-footer" style="text-align: right;" v-show="isOwner">
             <el-button @click="exitRoom">取 消</el-button>
-            <el-button type="primary" @click="createGame" v-show="isOwner">确 定</el-button>
+            <el-button type="primary" @click="createGame">确 定</el-button>
         </div>
     </el-dialog>
 </template>
@@ -178,7 +191,7 @@ export default {
             roomId: storeToRefs(room).roomid,
             changePlayers: false,
 
-            isOwner: room.roomowner.id === room.userid,
+            isOwner: storeToRefs(room).isowner,
             //todo
             // roomId,
             // username_Owner,
@@ -242,7 +255,7 @@ export default {
         exitRoom: function () {
             get("/api/room/exit/" + room.userid + "/" + room.roomid,
                 () => { ElMessage.success("返回成功") });
-            this.$router.push('/index');
+            this.$router.push('/homepage');
         },
         changePlayer: function () {
             // let tmpname = room.blackplayername;
@@ -262,6 +275,7 @@ export default {
             post("/api/chessBoard/" + room.userid + "/" + room.roomid,
                 { whitePlayerId: room.whiteplayer.id, blackPlayerId: room.blackplayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
+            this.showDialog = false;
         }
     },
 
