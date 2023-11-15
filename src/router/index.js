@@ -28,11 +28,11 @@ const router = createRouter({
       name: 'homepage',
       component: () => import('@/views/HomePageView.vue')
     },
-    {
-      path: '/index',
-      name: 'index',
-      component: () => import('@/views/IndexView.vue')
-    },
+    // {
+    //   path: '/index',
+    //   name: 'index',
+    //   component: () => import('@/views/IndexView.vue')
+    // },
     {
       path: '/game',
       name: 'game',
