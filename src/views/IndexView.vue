@@ -1,23 +1,41 @@
 <template>
-    <div class="all">
-        <div class="title">
-            <h1 style="font-size: 48px;">
-                欢迎来到围棋平台
-            </h1>
-        </div>
+    <div>
+        <el-image style="width: 100%;height: 100%;opacity: 0.5;filter: blur(3px);" fit="cover" :src="background"></el-image>
+    </div>
 
-
-        <el-row style="text-align: center;">
+    <el-card class="card">
+        <el-row>
             <el-col>
-                <el-button @click="createRoom" class="button" type="success" size="large" plain>创建房间</el-button>
+                <h1 style="font-size: 48px; text-align: center;">
+                    欢迎来到围棋平台
+                </h1>
+            </el-col>
+        </el-row>
+
+        <el-row>
+            <el-col :span="12">
+                <el-button @click="createRoom" type="success" icon="CaretLeft" plain
+                    style="width:200px;height: 200px;font-size: 24px;">
+                    <div style="width: 100%;height: 100px;text-align: center;">
+                        <el-image :src="plus_img"></el-image>
+                        <p style="text-align: center;">创建房间</p>
+                    </div>
+                </el-button>
             </el-col>
 
-            <el-col>
-                <el-button @click="joinRoomDialogVisible.state = true" class="button" type="success" size="large"
-                    plain>加入房间</el-button>
-            </el-col>
+            <el-col :span="12">
+                <el-button @click="joinRoomDialogVisible.state = true" type="success" plain>
+                    <el-icon>
+                        <Plus />
+                    </el-icon>
+                    加入房间
+                </el-button>
 
-            <el-col>
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top: 300px;">
+            <el-col :offset="20" :span="4">
                 <el-button @click="logout" class="button" type="danger" size="large" plain>退出登录</el-button>
             </el-col>
         </el-row>
@@ -36,7 +54,7 @@
                 </div>
             </el-dialog>
         </div>
-    </div>
+    </el-card>
 </template>
 
 <script setup>
@@ -48,6 +66,9 @@ import { get, post, put } from '../net';
 import { Loading } from 'element-plus/es/components/loading/src/service';
 import { ref } from 'vue';
 import { roomowner, user2 } from "../net/websocket"
+import background from '../assets/img/test.jpg'
+import plus_img from '../assets/img/plus.png'
+import { HomeFilled, Plus } from "@element-plus/icons-vue";
 
 const router = useRouter();
 
@@ -89,23 +110,15 @@ const joinRoom = () => {
 </script>
 
 <style scoped>
-.all {
-    width: 400px;
-    height: 300px;
+.card {
+    width: 1000px;
+    height: 600px;
     position: absolute;
-    top: 20%;
+    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
     margin: auto;
-}
-
-.title {
-    text-align: center;
-}
-
-.button {
-    margin-top: 10px;
-    text-align: center;
-
+    border-radius: 30px
 }
 </style>
