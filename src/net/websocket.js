@@ -1,7 +1,10 @@
 import { get } from '../net/index.js';
 import mitt from 'mitt';
+import { useRoomStore } from '../stores/RoomInformation.js'
 
 export const bus = mitt();
+
+const room = useRoomStore();
 
 // WebSocket
 var ws = null;
@@ -26,6 +29,12 @@ function ws_create(url) {
         ws_recontent(url);
         console.log(e);
     }
+}
+
+function ws_close(){
+    ws.close()
+    room.ws_state = false
+    ws_heartCheck.reset()
 }
 
 let chessboard = new Array(19).fill(Array(19).fill(-1));
@@ -110,16 +119,17 @@ function ws_event(ws, url) {
 
 // 重新连接websocker(WebSocket连接地址)
 function ws_recontent(url) {
-	// 延迟避免请求过多
-	setTimeout(function () {
-		ws_create(url);
-	}, 2000);
+    if(room.ws_state){
+	    // 延迟避免请求过多
+	    setTimeout(function () {
+	    	ws_create(url);
+	    }, 2000);
+    }
 }
 
 // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，这样服务端会抛异常。
 window.onbeforeunload = function() {
-    //get("/api/room/exit" + localStorage.getItem("userid") + localStorage.getItem("roomid"));
-    ws.close();
+    ws_close()
 } 
 
 // WebSocket心跳检测
@@ -151,6 +161,7 @@ export {
     ws,
     ws_url,
     ws_create,
+    ws_close,
     chessboard,
     user2,
     roomowner,

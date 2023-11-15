@@ -51,7 +51,8 @@ import { ws, ws_create } from '../../net/websocket';
 import { get, post } from '../../net/index';
 import { useRouter } from 'vue-router';
 import axios from "axios";
-import { getRowIdentity } from 'element-plus/es/components/table/src/util';
+import { useRoomStore } from '../../stores/RoomInformation'
+// import { getRowIdentity } from 'element-plus/es/components/table/src/util';
 
 const router = useRouter();
 
@@ -59,11 +60,14 @@ const form = reactive({
     "username": "",
     "password": "",
     "remembered": false,
-})
+});
+
+const room = useRoomStore();
 
 //持久化账号密码
 form.username = localStorage.getItem("username");
 form.password = localStorage.getItem("password");
+form.remembered = localStorage.getItem("remembered") == 'true' ? true: false;
 
 const login = () => {
     if (!form.username || !form.password) {
@@ -75,18 +79,30 @@ const login = () => {
             "password": form.password,
         }, (message) => {
             ElMessage.success('登陆成功!')
-            localStorage.setItem('username', form.username);
-            localStorage.setItem("userid", message.result.user.id)
             if (form.remembered) {
+                localStorage.setItem('username', form.username);
+                localStorage.setItem("userid", message.result.user.id)
                 localStorage.setItem('password', form.password); 
-                localStorage.setItem("remembered", form.remembered)   // 持久化
+                localStorage.setItem("remembered", 'true')   // 持久化
+            }
+            else{
+                localStorage.setItem('username', '');
+                localStorage.setItem("userid", '')
+                localStorage.setItem('password', ''); 
+                localStorage.setItem("remembered", 'false')   // 持久化
             }
             axios.defaults.headers.common['Authorization'] = `Bearer ${message.result.token}`;
-            //localStorage.setItem("wstoken", message.result.token)
+            localStorage.setItem("Authorization", message.result.token)
+
+            //建立websocket连接
             let url = "wss://dragondj.space/ws?Authorization=" + message.result.token;
+            room.ws_state = true
             ws_create(url)
             //let ws = new WebSocket(url)
-            router.push('/index')
+            //router.push('/index')
+
+            //页面跳转
+            router.push('/homepage')
         }
         )
     }
@@ -95,3 +111,4 @@ const login = () => {
 </script>
 
 <style scoped></style>
+
