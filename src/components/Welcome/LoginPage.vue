@@ -52,6 +52,7 @@ import { get, post } from '../../net/index';
 import { useRouter } from 'vue-router';
 import axios from "axios";
 import { useRoomStore } from '../../stores/roomInformation'
+import { ElMessage, ElNotification } from 'element-plus'
 // import { getRowIdentity } from 'element-plus/es/components/table/src/util';
 
 const router = useRouter();
@@ -67,7 +68,7 @@ const room = useRoomStore();
 //持久化账号密码
 form.username = localStorage.getItem("username");
 form.password = localStorage.getItem("password");
-form.remembered = localStorage.getItem("remembered") == 'true' ? true: false;
+form.remembered = localStorage.getItem("remembered") == 'true' ? true : false;
 
 const login = () => {
     if (!form.username || !form.password) {
@@ -78,17 +79,21 @@ const login = () => {
             "feature": form.username,
             "password": form.password,
         }, (message) => {
-            ElMessage.success('登陆成功!')
+            // ElMessage.success('登陆成功!')
+            ElNotification({
+                title: "登陆成功",
+                type: 'success'
+            })
             if (form.remembered) {
                 localStorage.setItem('username', form.username);
                 localStorage.setItem("userid", message.result.user.id)
-                localStorage.setItem('password', form.password); 
+                localStorage.setItem('password', form.password);
                 localStorage.setItem("remembered", 'true')   // 持久化
             }
-            else{
+            else {
                 localStorage.setItem('username', '');
                 localStorage.setItem("userid", '')
-                localStorage.setItem('password', ''); 
+                localStorage.setItem('password', '');
                 localStorage.setItem("remembered", 'false')   // 取消持久化
             }
             //持久化用户的token

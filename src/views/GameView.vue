@@ -27,7 +27,7 @@
                             <img :src="blackStone" class="stone">
                             <!-- todo:userid -->
                             <span>{{ " " + blackPlayer.name }}</span>
-                            <el-icon v-show="player_is_black">
+                            <el-icon v-show="playerIsBlack">
                                 <CaretLeft />
                             </el-icon>
                         </el-text>
@@ -88,7 +88,7 @@
 
     <!-- 创建棋局弹窗 -->
     <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false" :before-close="resetData(done)">
+        :show-close="false" :before-close="resetData()">
         <div style="text-align: center;">
             <el-row v-show="isOwner">
                 <el-col>
@@ -145,7 +145,7 @@ import { get, post } from "../net";
 import black from '../components/Shudan/css/stone_1.png'
 import white from '../components/Shudan/css/stone_-1.png'
 import { CaretLeft } from "@element-plus/icons-vue";
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 import { useRoomStore } from '../stores/roomInformation';
 import { storeToRefs } from 'pinia'
 //import { router } from "../router"
@@ -242,7 +242,13 @@ export default {
         // },
         exitRoom: function () {
             get("/api/room/exit/" + room.userid + "/" + room.roomid,
-                () => { ElMessage.success("返回成功") });
+                () => {
+                    ElNotification({
+                        title: "返回成功",
+                        type: 'success'
+                    })
+                });
+            room.showdialog = true;
             this.$router.push('/homepage');
         },
         changePlayer: function () {
@@ -269,15 +275,14 @@ export default {
                 () => { });
             this.showDialog = false;
         },
-        resetData: function (done) {
+        resetData: function () {
             this.blackPlayer = storeToRefs(room).blackplayer;
             this.whitePlayer = storeToRefs(room).whiteplayer;
-            // this.showDialog = false;
         },
         waitOneStep: function () {
             if (room.isdrop) {
                 room.isdrop = false;
-                post("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, { }, () => { });
+                get("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, () => { });
             }
         },
     },

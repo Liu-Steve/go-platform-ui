@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 import axios from "axios";
 import { useRouter } from 'vue-router'
 import { reactive } from "vue";
@@ -107,7 +107,10 @@ const createRoom = () => {
             // room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
             // room.blackplayername = room.roomowner.name;
-            ElMessage.success('创建成功!');
+            ElNotification({
+                title: "创建成功",
+                type: 'success'
+            })
             router.push('/game');
         })
 }

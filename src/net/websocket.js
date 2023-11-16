@@ -1,6 +1,8 @@
 import { get } from '../net/index.js';
 import mitt from 'mitt';
 import { useRoomStore } from '../stores/roomInformation.js'
+import { ElMessage, ElNotification } from 'element-plus';
+// import { Notification } from 'element-ui'
 
 export const bus = mitt();
 
@@ -120,6 +122,9 @@ function ws_event(ws, url) {
                     break;
                 case 3://CHESS_STOP_ONCE_ANOTHER
                     room.chessboard = Cboard;
+                    room.playerisblack = !room.playerisblack;
+                    room.isdrop = true;
+                    ElNotification({ title: '对方选择停一手' })
                     break;
                 case 4://CHESS_REQUEST_STOP
                     room.chessboard = Cboard;
