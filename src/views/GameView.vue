@@ -226,7 +226,7 @@ export default {
                     post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
                         (message) => { },
                         (failure, resultcode) => {
-                            if (resiultcode === 12003) {
+                            if (resultcode === 12003) {
                                 room.isdrop = true;
                             }
                         });
