@@ -39,7 +39,7 @@
                             <img :src="whiteStone" class="stone">
                             <!-- todo:userid -->
                             <span>{{ " " + whitePlayer.name }}</span>
-                            <el-icon v-show="!player_is_black">
+                            <el-icon v-show="!playerIsBlack">
                                 <CaretLeft />
                             </el-icon>
                         </el-text>
@@ -150,7 +150,7 @@ import { useRoomStore } from '../stores/roomInformation';
 import { storeToRefs } from 'pinia'
 //import { router } from "../router"
 
-let rawSignMap = new Array(19 * 19).fill(0);
+// let rawSignMap = new Array(19 * 19).fill(0);
 // let cur_player = ref(1);
 
 const room = useRoomStore();
@@ -165,22 +165,23 @@ export default {
 
     data: function () {
         return {
-            signMap: JSON.parse(JSON.stringify(rawSignMap)),
+            signMap: storeToRefs(room).jsonchessboard,
             maxSize: 480,
             isBusy: false,
 
             blackStone: black,
             whiteStone: white,
 
-            rawSignMap: storeToRefs(room).chessboard,
+            // rawSignMap: storeToRefs(room).chessboard,
 
             // cur_player: true,
-            player_is_black: true,
+            playerIsBlack: storeToRefs(room).playerisblack,
 
-            blackPlayer: storeToRefs(room).blackplayer,
-            whitePlayer: storeToRefs(room).whiteplayer,
             roomId: storeToRefs(room).roomid,
             isOwner: storeToRefs(room).isowner,
+            blackPlayer: storeToRefs(room).blackplayer,
+            whitePlayer: storeToRefs(room).whiteplayer,
+
             showDialog: storeToRefs(room).showdialog,
         };
     },
@@ -215,25 +216,30 @@ export default {
 
     methods: {
         onVertexClick: function (offset) {
-            if (room.chessboard[offset] === 0) {
-                //todo 记录
-                // room.chessboard[offset] = this.player_is_black ?
-                // cur_player.value = -cur_player.value;
-                this.player_is_black = !this.player_is_black;
+            if (room.isdrop) {
+                if (room.chessboard[offset] === 0) {
+                    room.isdrop = false;
 
-                let x = parseInt(offset / 19);
-                let y = parseInt(offset - 19 * x);
+                    let y = parseInt(offset / 19);
+                    let x = parseInt(offset - 19 * y);
 
-                post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
-                    (message) => { });
+                    post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
+                        (message) => { },
+                        (failure, resultcode) => {
+                            if (resiultcode === 12003) {
+                                room.isdrop = true;
+                            }
+                        });
+                }
             }
+
         },
-        onReset: function () {
-            room.chessboard = new Array(19 * 19).fill(0);
-            this.signMap = JSON.parse(JSON.stringify(room.chessboard));
-            // cur_player.value = 1;
-            this.player_is_black = true;
-        },
+        // onReset: function () {
+        // room.chessboard = new Array(19 * 19).fill(0);
+        // this.signMap = JSON.parse(JSON.stringify(room.chessboard));
+        // // cur_player.value = 1;
+        // this.player_is_black = true;
+        // },
         exitRoom: function () {
             get("/api/room/exit/" + room.userid + "/" + room.roomid,
                 () => { ElMessage.success("返回成功") });

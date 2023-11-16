@@ -17,18 +17,16 @@ export const useRoomStore = defineStore('room', () => {
   const username = ref('')
   const ws_state = ref(false)
   const chessboard = ref(Array(19 * 19).fill(0));
-  const roomplayer = ref({id: "", name: ""});
-  const roomowner = ref({id: "", name: ""});
+  const jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
+  const roomplayer = ref({ id: "", name: "" });
+  const roomowner = ref({ id: "", name: "" });
   const blackplayer = ref(roomowner)
   const whiteplayer = ref(roomplayer)
   const gamestart = ref(false)
   const showdialog = ref(true)
   const isowner = ref(false)
-  // const blackplayername = ref('')
-  // const blackplayerid = ref('')
-  // const whiteplayername = ref('')
-  // const whiteplayerid = ref('')
-  // const currentcolor = ref('black')
+  const playerisblack = ref(false)
+  const isdrop = ref(true)
 
-  return { roomid, userid, username, ws_state, chessboard, roomplayer, roomowner, blackplayer, whiteplayer, gamestart, isowner, showdialog }
+  return { roomid, userid, username, ws_state, chessboard, jsonchessboard, roomplayer, roomowner, blackplayer, whiteplayer, gamestart, isowner, showdialog, playerisblack, isdrop }
 })
