@@ -63,7 +63,7 @@
 
                         <el-row style="margin-top: 10px;">
                             <el-col :span="6">
-                                <el-button type="success" @click="">停一手</el-button>
+                                <el-button type="success" @click="waitOneStep">停一手</el-button>
                             </el-col>
                             <el-col :span="6">
                                 <el-button type="warning" @click="">认输</el-button>
@@ -273,7 +273,13 @@ export default {
             this.blackPlayer = storeToRefs(room).blackplayer;
             this.whitePlayer = storeToRefs(room).whiteplayer;
             // this.showDialog = false;
-        }
+        },
+        waitOneStep: function () {
+            if (room.isdrop) {
+                room.isdrop = false;
+                post("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, { }, () => { });
+            }
+        },
     },
 
     computed: {
