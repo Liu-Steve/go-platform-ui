@@ -54,7 +54,7 @@
     <!-- 创建房间弹窗 -->
     <el-dialog title="加入房间" v-model="joinRoomDialogVisible.state" width="30%">
         <el-form :model="form">
-            <el-form-item label="房间ID" :label-width="formLabelWidth">
+            <el-form-item label="房间ID">
                 <el-input v-model="form.roomid" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>

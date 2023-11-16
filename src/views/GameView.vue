@@ -24,7 +24,7 @@
                 <el-col :span="12">
                     <el-card class="card">
                         <el-text style="font-size: 20px;">
-                            <img :src="blackUrl" class="stone">
+                            <img :src="blackStone" class="stone">
                             <!-- todo:userid -->
                             <span>{{ " " + blackPlayer.name }}</span>
                             <el-icon v-show="player_is_black">
@@ -36,7 +36,7 @@
                 <el-col :span="12">
                     <el-card class="card">
                         <el-text style="font-size: 20px;">
-                            <img :src="whiteUrl" class="stone">
+                            <img :src="whiteStone" class="stone">
                             <!-- todo:userid -->
                             <span>{{ " " + whitePlayer.name }}</span>
                             <el-icon v-show="!player_is_black">
@@ -53,7 +53,7 @@
                     <el-card class="card">
                         <el-row>
                             <el-col :span="8">
-                                <el-button type="warning" @click="tmp">重置棋盘</el-button>
+                                <el-button type="warning" @click="">重置棋盘</el-button>
                             </el-col>
                             <el-col :span="8">
                                 <el-button type="warning"
@@ -72,7 +72,7 @@
 
                         <el-row style="margin-top: 10px;">
                             <el-col :span="8">
-                                <el-button type="primary" @click="createGame">开始新游戏</el-button>
+                                <el-button type="primary" @click="showDialog = true">开始新游戏</el-button>
                             </el-col>
 
                             <el-col :span="6">
@@ -88,7 +88,7 @@
 
     <!-- 创建棋局弹窗 -->
     <el-dialog title="开始游戏" v-model="showDialog" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false">
+        :show-close="false" :before-close="resetData(done)">
         <div style="text-align: center;">
             <el-row v-show="isOwner">
                 <el-col>
@@ -98,7 +98,7 @@
             <el-row v-show="isOwner">
                 <el-col>
                     <el-text>
-                        <img :src="blackUrl" class="stone">
+                        <img :src="blackStone" class="stone">
                         <span style="font-size: large;">{{ " " + blackPlayer.name }}</span>
                     </el-text>
                 </el-col>
@@ -106,7 +106,7 @@
             <el-row v-show="isOwner">
                 <el-col>
                     <el-text>
-                        <img :src="whiteUrl" class="stone">
+                        <img :src="whiteStone" class="stone">
                         <span style="font-size: large;">{{ " " + whitePlayer.name }}</span>
                     </el-text>
                 </el-col>
@@ -131,8 +131,8 @@
             </el-row>
         </div>
         <div slot="footer" class="dialog-footer" style="text-align: right;" v-show="isOwner">
-            <el-button @click="exitRoom">取 消</el-button>
-            <el-button type="primary" @click="createGame">确 定</el-button>
+            <el-button @click="exitRoom">退出房间</el-button>
+            <el-button type="primary" @click="createGame">开始游戏</el-button>
         </div>
     </el-dialog>
 </template>
@@ -151,12 +151,12 @@ import { storeToRefs } from 'pinia'
 //import { router } from "../router"
 
 let rawSignMap = new Array(19 * 19).fill(0);
-let cur_player = ref(1);
+// let cur_player = ref(1);
 
 const room = useRoomStore();
 
 export default {
-    name: 'Shudan',
+    name: 'Game',
 
     components: {
         Goban,
@@ -166,32 +166,22 @@ export default {
     data: function () {
         return {
             signMap: JSON.parse(JSON.stringify(rawSignMap)),
-            maxSize: 0,
-            showCoordinates: false,
+            maxSize: 480,
             isBusy: false,
-            isAnimate: false,
-            player_is_black: true,
-            showDialog: storeToRefs(room).showdialog,
 
-            blackUrl: black,
-            whiteUrl: white,
+            blackStone: black,
+            whiteStone: white,
 
             rawSignMap: storeToRefs(room).chessboard,
+
+            // cur_player: true,
+            player_is_black: true,
 
             blackPlayer: storeToRefs(room).blackplayer,
             whitePlayer: storeToRefs(room).whiteplayer,
             roomId: storeToRefs(room).roomid,
-            changePlayers: false,
-
             isOwner: storeToRefs(room).isowner,
-            //todo
-            // roomId,
-            // username_Owner,
-            // username_User2,
-
-            // blackPlayer: username_Owner,
-            // whitePlayer,
-
+            showDialog: storeToRefs(room).showdialog,
         };
     },
 
@@ -226,22 +216,22 @@ export default {
     methods: {
         onVertexClick: function (offset) {
             if (room.chessboard[offset] === 0) {
-                room.chessboard[offset] = cur_player.value;
+                //todo 记录
+                // room.chessboard[offset] = this.player_is_black ?
                 // cur_player.value = -cur_player.value;
                 this.player_is_black = !this.player_is_black;
+
+                let x = parseInt(offset / 19);
+                let y = parseInt(offset - 19 * x);
+
+                post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
+                    (message) => { });
             }
-
-            let x = parseInt(offset / 19);
-            let y = parseInt(offset - 19 * x);
-
-            // this.signMap = JSON.parse(JSON.stringify(rawSignMap));
-            post("/api/chessBoard/drops/" + room.userid + "/" + room.roomid, { "dropPosition": [y, x] },
-                (message) => { });
         },
         onReset: function () {
             room.chessboard = new Array(19 * 19).fill(0);
             this.signMap = JSON.parse(JSON.stringify(room.chessboard));
-            cur_player.value = 1;
+            // cur_player.value = 1;
             this.player_is_black = true;
         },
         exitRoom: function () {
@@ -250,6 +240,9 @@ export default {
             this.$router.push('/homepage');
         },
         changePlayer: function () {
+
+            console.log(this.whitePlayer);
+            console.log(this.blackPlayer);
             // let tmpname = room.blackplayername;
             // let tmpid = room.blackplayerid;
             // room.blackplayername = room.whiteplayername;
@@ -261,13 +254,19 @@ export default {
             let tmp = room.blackplayer
             room.blackplayer = room.whiteplayer
             room.whiteplayer = tmp
-            this.changePlayers = !this.changePlayers;
+            // this.changePlayers = !this.changePlayers;
         },
         createGame: function () {
+            //todo 未满两人不得开始
             post("/api/chessBoard/" + room.userid + "/" + room.roomid,
                 { whitePlayerId: room.whiteplayer.id, blackPlayerId: room.blackplayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
             this.showDialog = false;
+        },
+        resetData: function (done) {
+            this.blackPlayer = storeToRefs(room).blackplayer;
+            this.whitePlayer = storeToRefs(room).whiteplayer;
+            // this.showDialog = false;
         }
     },
 

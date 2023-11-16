@@ -139,6 +139,7 @@ function ws_event(ws, url) {
             room.roomowner.id = room.userid;
             room.roomowner.name = room.username;
             room.isowner = true;
+            room.showdialog = true;
             break;
           }
             // callBack(roomowner, user2, chessboard);
