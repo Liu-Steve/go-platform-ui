@@ -29,7 +29,7 @@
 
             <el-row style="margin-top: 30px;height:250px;">
                 <el-col :span="12">
-                    <el-button @click="createRoom" type="success" plain class="button1">
+                    <el-button @click="createRoomDialogVisible.state = true" type="success" plain class="button1">
                         <div style="width: 100px;height: 150px;">
                             <el-image :src="home_img"></el-image>
                             <p style="text-align: center;"> 创建房间</p>
@@ -51,16 +51,40 @@
         </el-card>
     </div>
 
-    <!-- 创建房间弹窗 -->
+    <!-- 加入房间弹窗 -->
     <el-dialog title="加入房间" v-model="joinRoomDialogVisible.state" width="30%">
         <el-form :model="form">
             <el-form-item label="房间ID">
                 <el-input v-model="form.roomid" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>
+        <el-form>
+
+        </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="joinRoomDialogVisible.state = false">取 消</el-button>
             <el-button type="primary" @click="joinRoom">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- 创建房间弹窗 -->
+    <el-dialog title="选择游戏种类" v-model="createRoomDialogVisible.state" width="30%">
+        <el-row>
+            <el-col :span="12" style="text-align: center;">
+                <el-button @click="createRoom" type="success" size="large" plain>
+                    与人对弈
+                </el-button>
+            </el-col>
+            <el-col :span="12" style="text-align: center;">
+                <el-button @click="" type="success" size="large" plain>
+                    人机对弈
+                </el-button>
+            </el-col>
+        </el-row>
+
+        <div slot="footer" class="dialog-footer" style="text-align: center;">
+            <el-button @click="createRoomDialogVisible.state = false" type="primary">返 回</el-button>
+            <!-- <el-button type="primary" @click="joinRoom">确 定</el-button> -->
         </div>
     </el-dialog>
 </template>
@@ -90,6 +114,7 @@ const logout = () => {
     router.push('/')
 }
 
+let createRoomDialogVisible = reactive({ state: false });
 let joinRoomDialogVisible = reactive({ state: false });
 let form = reactive({
     roomid: '',

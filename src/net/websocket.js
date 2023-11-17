@@ -133,8 +133,15 @@ function ws_event(ws, url) {
                     room.roomowner.id = data.message.createUserId
                     room.roomowner.name = data.message.createUserName;
                     room.roomplayer.id = data.message.secondUserId;
-                    get("/api/user/" + room.roomplayer.id,
-                        (message) => { room.roomplayer.name = message.result.username })
+
+                    if (room.roomplayer.id === -1) {
+                        room.roomplayer.name = "电脑玩家";
+                    }
+                    else {
+                        get("/api/user/" + room.roomplayer.id,
+                            (message) => { room.roomplayer.name = message.result.username })
+                    }
+
                     // if(room.currentcolor === 'white') {
                     //     room.blackplayername = room.roomplayer.name;
                     //     room.blackplayerid = room.roomplayer.id;
