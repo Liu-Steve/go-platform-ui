@@ -89,6 +89,7 @@
                 <el-table :data="roomList" stripe empty-text="暂无房间" height="250">
                     <el-table-column label="房间ID" prop="roomId" />
                     <el-table-column label="房主" prop="createUserName" />
+                    <el-table-column label="人数" prop="personCount" />
                     <el-table-column width="100px">
                         <template #default="scope">
                             <el-button type="success" @click="joinRoom(room.userid, scope.row.roomId)">

@@ -129,6 +129,9 @@ function ws_event(ws, url) {
                 case 4://CHESS_REQUEST_STOP
                     room.chessboard = Cboard;
                     break;
+                case 5://CHESS_END
+
+                    break;
                 case 10://ROOM_ENTER
                     room.roomowner.id = data.message.createUserId
                     room.roomowner.name = data.message.createUserName;
