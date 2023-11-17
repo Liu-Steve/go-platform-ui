@@ -247,6 +247,10 @@ export default {
                         type: 'success'
                     })
                 });
+            room.blackplayer.id = ''
+            room.blackplayer.name = ''
+            room.whiteplayer.id = ''
+            room.whiteplayer.name = ''
             room.showdialog = true;
             this.$router.push('/homepage');
         },
