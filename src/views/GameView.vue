@@ -25,7 +25,6 @@
                     <el-card class="card">
                         <el-text style="font-size: 20px;">
                             <img :src="blackStone" class="stone">
-                            <!-- todo:userid -->
                             <span>{{ " " + blackPlayer.name }}</span>
                             <el-icon v-show="playerIsBlack">
                                 <CaretLeft />

@@ -32,16 +32,16 @@
                     <el-button @click="createRoomDialogVisible.state = true" type="success" plain class="button1">
                         <div style="width: 100px;height: 150px;">
                             <el-image :src="home_img"></el-image>
-                            <p style="text-align: center;"> 创建房间</p>
+                            <p style="text-align: center;">创建房间</p>
                         </div>
                     </el-button>
                 </el-col>
 
                 <el-col :span="12">
-                    <el-button @click="joinRoomDialogVisible.state = true" type="success" plain class="button1">
+                    <el-button @click="joinRoomDialogVisible.state = true;" type="success" plain class="button1">
                         <div style="width: 100px;height: 150px;">
                             <el-image :src="plus_img"></el-image>
-                            <p style="text-align: center;"> 加入房间</p>
+                            <p style="text-align: center;">加入房间</p>
                         </div>
                     </el-button>
 
@@ -51,24 +51,8 @@
         </el-card>
     </div>
 
-    <!-- 加入房间弹窗 -->
-    <el-dialog title="加入房间" v-model="joinRoomDialogVisible.state" width="30%">
-        <el-form :model="form">
-            <el-form-item label="房间ID">
-                <el-input v-model="form.roomid" autocomplete="off"></el-input>
-            </el-form-item>
-        </el-form>
-        <el-form>
-
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="joinRoomDialogVisible.state = false">取 消</el-button>
-            <el-button type="primary" @click="joinRoom">确 定</el-button>
-        </div>
-    </el-dialog>
-
     <!-- 创建房间弹窗 -->
-    <el-dialog title="选择游戏种类" v-model="createRoomDialogVisible.state" width="30%">
+    <el-dialog title="选择游戏种类" v-model="createRoomDialogVisible.state" width="20%">
         <el-row>
             <el-col :span="12" style="text-align: center;">
                 <el-button @click="createRoom" type="success" size="large" plain>
@@ -82,10 +66,65 @@
             </el-col>
         </el-row>
 
-        <div slot="footer" class="dialog-footer" style="text-align: center;">
+        <div slot="footer" class="dialog-footer" style="text-align: center;margin-top: 30px;">
             <el-button @click="createRoomDialogVisible.state = false" type="primary">返 回</el-button>
-            <!-- <el-button type="primary" @click="joinRoom">确 定</el-button> -->
         </div>
+    </el-dialog>
+
+    <!-- 加入房间弹窗 -->
+    <el-dialog title="加入房间" v-model="joinRoomDialogVisible.state" width="30%" :before-close="resetData()">
+
+        <el-row>
+            <el-col :span="12">
+                <el-text size="large" tag="h3">
+                    当前可加入房间：
+                </el-text>
+            </el-col>
+            <el-col :span="12">
+                <el-button @click=resetData() style="float: right;margin-right: 25px;" type="primary">刷 新</el-button>
+            </el-col>
+        </el-row>
+        <el-row style="margin-top: 10px;">
+            <el-col>
+                <el-table :data="roomList" stripe empty-text="暂无房间" height="250">
+                    <el-table-column label="房间ID" prop="roomId" />
+                    <el-table-column label="房主" prop="createUserName" />
+                    <el-table-column width="100px">
+                        <template #default="scope">
+                            <el-button type="success" @click="joinRoom(room.userid, scope.row.roomId)">
+                                加 入
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top: 10px;">
+            <el-col>
+                <el-text size="large" tag="h3">
+                    输入房间ID加入：
+                </el-text>
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top: 10px;">
+            <el-col>
+                <el-form :model="form">
+                    <el-form-item label="房间ID">
+                        <el-row :gutter="10" style="width: 100%;">
+                            <el-col :span="18">
+                                <el-input v-model="form.roomid" autocomplete="off"></el-input>
+                            </el-col>
+                            <el-col :span="6">
+                                <el-button type="success" @click="joinRoom(room.userid, form.roomid)">加 入</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-form-item>
+
+                </el-form>
+            </el-col>
+        </el-row>
     </el-dialog>
 </template>
 
@@ -93,7 +132,7 @@
 import { ElMessage, ElNotification } from 'element-plus';
 import axios from "axios";
 import { useRouter } from 'vue-router'
-import { reactive } from "vue";
+import { nextTick, reactive, ref } from "vue";
 import { get, post, put } from '../net';
 import { useRoomStore } from "../stores/roomInformation.js"
 import { ws, ws_close } from "../net/websocket"
@@ -140,8 +179,8 @@ const createRoom = () => {
         })
 }
 
-const joinRoom = () => {
-    get("/api/room/enter/" + room.userid + "/" + form.roomid,
+const joinRoom = (userid, roomid) => {
+    get("/api/room/enter/" + userid + "/" + roomid,
         (message) => {
             room.roomid = message.result.roomId
             room.roomowner.id = message.result.createUserId;
@@ -151,6 +190,21 @@ const joinRoom = () => {
             room.isowner = false;
             router.push("/game");
         })
+}
+
+let roomList = ref();
+
+const resetData = () => {
+    get("/api/room/list",
+        (message) => {
+            roomList.value = reactive([]);
+            for (let i = 0, len = message.result.length; i < len; i++) {
+                if (message.result[i].personCount === 1) {
+                    roomList.value.push(message.result[i])
+                }
+            }
+        })
+    form.roomid = '';
 }
 
 </script>
