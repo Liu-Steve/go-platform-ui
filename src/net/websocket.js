@@ -131,6 +131,7 @@ function ws_event(ws, url) {
                     break;
                 case 5://CHESS_END
                     room.showdialogend = true;
+                    room.gamestart = false;
                     if (data.message.mode === 0) {//双方停一手结束对局
                         if (data.message.winner === "black") {
                             room.winner = "获胜方： " + room.blackplayer.name

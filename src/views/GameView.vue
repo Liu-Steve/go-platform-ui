@@ -51,16 +51,16 @@
                 <el-col>
                     <el-card class="card">
                         <el-row>
-                            <el-col :span="8">
+                            <!-- <el-col :span="8">
                                 <el-button type="warning" @click="">重置棋盘</el-button>
-                            </el-col>
+                            </el-col> -->
                             <el-col :span="8">
                                 <el-button type="warning"
-                                    @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
+                                    @click="{ showDialog = true; console.log(blackPlayer) }">配置房间</el-button>
                             </el-col>
-                            <el-col :span="8">
+                            <!-- <el-col :span="8">
                                 <el-button type="warning" @click=" showDialogEnd = true">显示结束弹窗</el-button>
-                            </el-col>
+                            </el-col> -->
                         </el-row>
 
                         <el-row style="margin-top: 10px;">
@@ -299,6 +299,7 @@ export default {
             room.whiteplayer.name = ''
             room.showdialog = true;
             room.showdialogend = false;
+            room.gamestart = false;
             this.$router.push('/homepage');
         },
         changePlayer: function () {
@@ -323,6 +324,7 @@ export default {
             post("/api/chessBoard/" + room.userid + "/" + room.roomid,
                 { whitePlayerId: room.whiteplayer.id, blackPlayerId: room.blackplayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
+            room.gamestart = false;
             this.showDialog = false;
         },
         resetData: function () {
@@ -332,10 +334,12 @@ export default {
         waitOneStep: function () {
             if (room.isdrop) {
                 room.isdrop = false;
+                room.playerisblack = !room.playerisblack;
                 get("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, () => { });
             }
         },
         surrender: function () {
+            room.gamestart = false;
             room.showdialogend = true;
             room.isnotsurrender = false;
             room.winner = "你选择投降！"

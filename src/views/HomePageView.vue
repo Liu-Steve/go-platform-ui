@@ -169,8 +169,8 @@ const createRoom = () => {
             room.roomowner.id = message.result.createUserId;
             room.isowner = true;
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
-            // room.roomplayer.name = ''
-            // room.roomplayer.id = ''
+            room.roomplayer.name = ''
+            room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
             // room.blackplayername = room.roomowner.name;
             ElNotification({
