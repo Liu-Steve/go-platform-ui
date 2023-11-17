@@ -68,7 +68,7 @@
                                 <el-button type="success" @click="waitOneStep">停一手</el-button>
                             </el-col>
                             <el-col :span="6">
-                                <el-button type="warning" @click="">认输</el-button>
+                                <el-button type="warning" @click="surrender">认输</el-button>
                             </el-col>
                         </el-row>
 
@@ -142,18 +142,20 @@
     <el-dialog title="游戏结束" v-model="showDialogEnd" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
         :show-close="false" :before-close="resetData()">
         <div style="text-align: center;">
-            <div v-show=isOwner>
+            <div>
                 <el-row>
                     <el-col>
-                        <el-text style="font-size: large;">获胜方：{{ blackPlayer.name }}</el-text>
+                        <el-text style="font-size: large;">{{ Winner }}</el-text>
                     </el-col>
                 </el-row>
+            </div>
+            <div v-show=isNotSurrender>
                 <el-row>
                     <el-col>
                         <el-text>
                             <img :src="blackStone" class="stone">
                             <span style="font-size: large;">{{ " " + blackPlayer.name }}：</span>
-                            <span style="font-size: large;">XX目</span>
+                            <span style="font-size: large;">{{ " " + blackCount + "目" }}</span>
                         </el-text>
                     </el-col>
                 </el-row>
@@ -162,7 +164,7 @@
                         <el-text>
                             <img :src="whiteStone" class="stone">
                             <span style="font-size: large;">{{ " " + whitePlayer.name }}：</span>
-                            <span style="font-size: large;">XX目</span>
+                            <span style="font-size: large;">{{ " " + whiteCount + "目" }}</span>
                         </el-text>
                     </el-col>
                 </el-row>
@@ -219,9 +221,13 @@ export default {
             isOwner: storeToRefs(room).isowner,
             blackPlayer: storeToRefs(room).blackplayer,
             whitePlayer: storeToRefs(room).whiteplayer,
+            Winner: storeToRefs(room).winner,
+            whiteCount: storeToRefs(room).whitecount,
+            blackCount: storeToRefs(room).blackcount,
 
             showDialog: storeToRefs(room).showdialog,
-            showDialogEnd: false,
+            showDialogEnd: storeToRefs(room).showdialogend,
+            isNotSurrender: storeToRefs(room).isnotsurrender,
         };
     },
 
@@ -292,6 +298,7 @@ export default {
             room.whiteplayer.id = ''
             room.whiteplayer.name = ''
             room.showdialog = true;
+            room.showdialogend = false;
             this.$router.push('/homepage');
         },
         changePlayer: function () {
@@ -328,6 +335,11 @@ export default {
                 get("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, () => { });
             }
         },
+        surrender: function () {
+            room.showdialogend = true;
+            room.isnotsurrender = false;
+            room.winner = "你选择投降！"
+        }
     },
 
     computed: {

@@ -130,7 +130,25 @@ function ws_event(ws, url) {
                     room.chessboard = Cboard;
                     break;
                 case 5://CHESS_END
-
+                    room.showdialogend = true;
+                    if (data.message.mode === 0) {//双方停一手结束对局
+                        if (data.message.winner === "black") {
+                            room.winner = "获胜方： " + room.blackplayer.name
+                        }
+                        else if (data.message.winner === "white") {
+                            room.winner = "获胜方： " + room.whiteplayer.name
+                        }
+                        else if (data.message.winner === "equal") {
+                            room.winner = "双方平局"
+                        }
+                        room.whitecount = data.message.white
+                        room.blackcount = data.message.black
+                        room.isnotsurrender = true;
+                    }
+                    else if (data.message.mode === 1) {//对方认输结束对局
+                        room.isnotsurrender = false;
+                        room.winner = "对方投降，你赢了！"
+                    }
                     break;
                 case 10://ROOM_ENTER
                     room.roomowner.id = data.message.createUserId

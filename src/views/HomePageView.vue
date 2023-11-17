@@ -60,7 +60,7 @@
                 </el-button>
             </el-col>
             <el-col :span="12" style="text-align: center;">
-                <el-button @click="" type="success" size="large" plain>
+                <el-button @click="createAIRoom" type="success" size="large" plain>
                     人机对弈
                 </el-button>
             </el-col>
@@ -168,6 +168,7 @@ const createRoom = () => {
             room.roomowner.name = message.result.createUserName;
             room.roomowner.id = message.result.createUserId;
             room.isowner = true;
+            room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
             // room.roomplayer.name = ''
             // room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
@@ -176,6 +177,29 @@ const createRoom = () => {
                 title: "创建成功",
                 type: 'success'
             })
+            router.push('/game');
+        })
+}
+
+const createAIRoom = () => {
+    put('/api/room/kata/' + room.userid, {},
+        (message) => {
+            room.roomid = message.result.roomId;
+            room.roomowner.name = message.result.createUserName;
+            room.roomowner.id = message.result.createUserId;
+            room.isowner = true;
+            room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
+            // room.roomplayer.name = ''
+            // room.roomplayer.id = ''
+            // room.blackplayerid = room.roomowner.id;
+            // room.blackplayername = room.roomowner.name;
+            ElNotification({
+                title: "创建成功",
+                type: 'success'
+            })
+
+            room.roomplayer = {id: -1, name: '电脑玩家'}
+
             router.push('/game');
         })
 }
@@ -189,6 +213,7 @@ const joinRoom = (userid, roomid) => {
             room.roomplayer.name = room.username
             room.roomplayer.id = room.userid
             room.isowner = false;
+            room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
             router.push("/game");
         })
 }
