@@ -58,6 +58,9 @@
                                 <el-button type="warning"
                                     @click="{ showDialog = true; console.log(blackPlayer) }">显示弹窗</el-button>
                             </el-col>
+                            <el-col :span="8">
+                                <el-button type="warning" @click=" showDialogEnd = true">显示结束弹窗</el-button>
+                            </el-col>
                         </el-row>
 
                         <el-row style="margin-top: 10px;">
@@ -134,6 +137,42 @@
             <el-button type="primary" @click="createGame">开始游戏</el-button>
         </div>
     </el-dialog>
+
+    <!-- 游戏结束弹窗 -->
+    <el-dialog title="游戏结束" v-model="showDialogEnd" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false" :before-close="resetData()">
+        <div style="text-align: center;">
+            <div v-show=isOwner>
+                <el-row>
+                    <el-col>
+                        <el-text style="font-size: large;">获胜方：{{ blackPlayer.name }}</el-text>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-text>
+                            <img :src="blackStone" class="stone">
+                            <span style="font-size: large;">{{ " " + blackPlayer.name }}：</span>
+                            <span style="font-size: large;">XX目</span>
+                        </el-text>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-text>
+                            <img :src="whiteStone" class="stone">
+                            <span style="font-size: large;">{{ " " + whitePlayer.name }}：</span>
+                            <span style="font-size: large;">XX目</span>
+                        </el-text>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer" style="text-align: right;">
+            <el-button type="success" @click="{ showDialogEnd = false; showDialog = true }" v-show=isOwner>开始新游戏</el-button>
+            <el-button type="danger" @click="exitRoom">退出房间</el-button>
+        </div>
+    </el-dialog>
 </template>
 
 
@@ -182,6 +221,7 @@ export default {
             whitePlayer: storeToRefs(room).whiteplayer,
 
             showDialog: storeToRefs(room).showdialog,
+            showDialogEnd: false,
         };
     },
 
