@@ -113,10 +113,10 @@
                 <el-form :model="form">
                     <el-form-item label="房间ID">
                         <el-row :gutter="10" style="width: 100%;">
-                            <el-col :span="18">
+                            <el-col :span="20">
                                 <el-input v-model="form.roomid" autocomplete="off"></el-input>
                             </el-col>
-                            <el-col :span="6">
+                            <el-col :span="4">
                                 <el-button type="success" @click="joinRoom(room.userid, form.roomid)">加 入</el-button>
                             </el-col>
                         </el-row>
@@ -197,7 +197,7 @@ let roomList = ref();
 const resetData = () => {
     get("/api/room/list",
         (message) => {
-            roomList.value = reactive([]);
+            roomList.value = [];
             for (let i = 0, len = message.result.length; i < len; i++) {
                 if (message.result[i].personCount === 1) {
                     roomList.value.push(message.result[i])
