@@ -148,6 +148,7 @@ function ws_event(ws, url) {
                 case 5://CHESS_END
                     room.showdialogend = true;
                     room.gamestart = false;
+                    room.isnotsurrender = false;
                     room.selectedmap = Array(19 * 19).fill(false);
                     if (data.message.mode === 0) {//双方停一手结束对局
                         if (data.message.winner === "black") {
@@ -164,13 +165,13 @@ function ws_event(ws, url) {
                         room.isnotsurrender = true;
                     }
                     else if (data.message.mode === 1) {//对方认输结束对局
-                        room.isnotsurrender = false;
+                        // room.isnotsurrender = false;
                         room.winner = "对方投降，你赢了！"
                     }
                     room.waitforresult = false;
                     break;
                 case 6://等待结果
-                    //room.showdialogend = true;
+                    room.showdialogend = true;
                     room.waitforresult = true;
                     break;
                 case 10://ROOM_ENTER
