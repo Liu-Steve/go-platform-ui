@@ -116,6 +116,7 @@ function ws_event(ws, url) {
                     room.playerisblack = !room.playerisblack;
                     room.isdrop = true;
                     if (room.gamestart) {
+                        room.selectedmap = Array(19 * 19).fill(false);
                         room.selectedmap[data.message.lastPos[0] * 19 + data.message.lastPos[1]] = true;
                     }
                     //当前方执黑
