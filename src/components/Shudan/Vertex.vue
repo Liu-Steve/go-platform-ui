@@ -1,5 +1,13 @@
 <script>
+import pointImage from "./css/point.png"
+
 export default {
+
+    data: function () {
+        return {
+            point: pointImage,
+        };
+    },
     props: {
         sign: {
             type: Number,
@@ -98,12 +106,14 @@ export default {
                 'shudan-stone-image',
                 `shudan-random_${random}`,
                 `shudan-sign_${sign}`
-            ]"/>
+            ]" />
             <div v-if="!!sign && !!marker" key="marker" class="shudan-marker" :title="marker.label" />
         </div>
 
         <div v-if="!!paint" key="paint" class="shudan-paint" style="z-index: 3;" />
-        <div v-if="selected" key="selection" class="shudan-selection" style="z-index: 4;" />
+        <div v-if="selected" key="selection" class="shudan-selection" style="z-index: 4;">
+            <img :src="point" style="width:100%;height:100%;" />
+        </div>
         <div v-if="!!heat" key="heat" class="shudan-heat" style="z-index: 5;" />
         <div v-if="!!heat" key="heatlabel" class="shudan-heatlabel" style="z-index: 6;"
             v-text="heat.text && heat.text.toString()" />
