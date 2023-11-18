@@ -116,7 +116,6 @@ function ws_event(ws, url) {
                     room.playerisblack = !room.playerisblack;
                     room.isdrop = true;
                     if (room.gamestart) {
-                        room.selectedmap = Array(19 * 19).fill(false);
                         room.selectedmap[data.message.lastPos[0] * 19 + data.message.lastPos[1]] = true;
                     }
                     //当前方执黑
@@ -126,6 +125,7 @@ function ws_event(ws, url) {
                         room.playerisblack = true;
                         room.isnotsurrender = true;
                         room.showdialogend = false;
+                        room.selectedmap = Array(19 * 19).fill(false);
                         if (room.whiteplayer.id === room.userid) {
                             let tmp = room.blackplayer;
                             room.blackplayer = room.whiteplayer;
@@ -148,6 +148,7 @@ function ws_event(ws, url) {
                 case 5://CHESS_END
                     room.showdialogend = true;
                     room.gamestart = false;
+                    room.selectedmap = Array(19 * 19).fill(false);
                     if (data.message.mode === 0) {//双方停一手结束对局
                         if (data.message.winner === "black") {
                             room.winner = "获胜方： " + room.blackplayer.name
@@ -169,7 +170,7 @@ function ws_event(ws, url) {
                     room.waitforresult = false;
                     break;
                 case 6://等待结果
-                    room.showdialogend = true;
+                    //room.showdialogend = true;
                     room.waitforresult = true;
                     break;
                 case 10://ROOM_ENTER

@@ -171,6 +171,7 @@ const createRoom = () => {
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
             room.roomplayer.name = ''
             room.roomplayer.id = ''
+            room.selectedmap = Array(19 * 19).fill(false);
             // room.blackplayerid = room.roomowner.id;
             // room.blackplayername = room.roomowner.name;
             ElNotification({
@@ -190,6 +191,7 @@ const createAIRoom = () => {
             room.isowner = true;
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
             room.gamestart = false;
+            room.selectedmap = Array(19 * 19).fill(false);
             // room.roomplayer.name = ''
             // room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
@@ -215,6 +217,7 @@ const joinRoom = (userid, roomid) => {
             room.roomplayer.name = room.username
             room.roomplayer.id = room.userid
             room.isowner = false;
+            room.selectedmap = Array(19 * 19).fill(false);
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
             room.gamestart = false;
             router.push("/game");

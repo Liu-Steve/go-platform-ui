@@ -19,7 +19,18 @@
                 </el-col>
             </el-row>
 
-            <!-- 第二行，显示当前黑白棋的卡片 -->
+            <!-- 第二行，显示用户名 -->
+            <el-row style="margin-top: 30px;">
+                <el-col>
+                    <el-card class="card">
+                        <el-text style="font-size: 20px;">
+                            用户名： {{ userName }}
+                        </el-text>
+                    </el-card>
+                </el-col>
+            </el-row>
+
+            <!-- 第三行，显示当前黑白棋的卡片 -->
             <el-row :gutter="20" style="margin-top: 20px;">
                 <el-col :span="12">
                     <el-card class="card">
@@ -45,7 +56,7 @@
                 </el-col>
             </el-row>
 
-            <!-- 第三行，按钮卡片 -->
+            <!-- 第四行，按钮卡片 -->
             <el-row style="margin-top: 20px;">
                 <el-col>
                     <el-card class="card">
@@ -220,6 +231,7 @@ export default {
             playerIsBlack: storeToRefs(room).playerisblack,
 
             roomId: storeToRefs(room).roomid,
+            userName: storeToRefs(room).username,
             isOwner: storeToRefs(room).isowner,
             blackPlayer: storeToRefs(room).blackplayer,
             whitePlayer: storeToRefs(room).whiteplayer,
@@ -337,6 +349,7 @@ export default {
             room.gamestart = false;
             room.showdialogend = true;
             room.isnotsurrender = false;
+            room.selectedmap = Array(19 * 19).fill(false);
             get("/api/chessBoard/over_request/" + room.userid + '/' + room.roomid, () => { })
         },
     },
