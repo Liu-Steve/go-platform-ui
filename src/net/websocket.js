@@ -155,6 +155,7 @@ function ws_event(ws, url) {
                     room.roomowner.id = data.message.createUserId
                     room.roomowner.name = data.message.createUserName;
                     room.roomplayer.id = data.message.secondUserId;
+                    room.disablestartgame = false;
 
                     if (room.roomplayer.id === -1) {
                         room.roomplayer.name = "电脑玩家";
@@ -180,6 +181,7 @@ function ws_event(ws, url) {
                     room.roomowner.name = room.username;
                     room.isowner = true;
                     room.showdialog = true;
+                    room.disablestartgame = true;
                     break;
             }
             // callBack(roomowner, user2, chessboard);

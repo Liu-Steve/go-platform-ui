@@ -36,7 +36,6 @@
                     <el-card class="card">
                         <el-text style="font-size: 20px;">
                             <img :src="whiteStone" class="stone">
-                            <!-- todo:userid -->
                             <span>{{ " " + whitePlayer.name }}</span>
                             <el-icon v-show="!playerIsBlack">
                                 <CaretLeft />
@@ -134,7 +133,7 @@
         </div>
         <div slot="footer" class="dialog-footer" style="text-align: right;" v-show="isOwner">
             <el-button @click="exitRoom">退出房间</el-button>
-            <el-button type="primary" @click="createGame">开始游戏</el-button>
+            <el-button type="primary" @click="createGame" :disabled="disableStartGame">开始游戏</el-button>
         </div>
     </el-dialog>
 
@@ -190,9 +189,6 @@ import { useRoomStore } from '../stores/roomInformation';
 import { storeToRefs } from 'pinia'
 //import { router } from "../router"
 
-// let rawSignMap = new Array(19 * 19).fill(0);
-// let cur_player = ref(1);
-
 const room = useRoomStore();
 
 export default {
@@ -228,6 +224,7 @@ export default {
             showDialog: storeToRefs(room).showdialog,
             showDialogEnd: storeToRefs(room).showdialogend,
             isNotSurrender: storeToRefs(room).isnotsurrender,
+            disableStartGame: storeToRefs(room).disablestartgame,
         };
     },
 
@@ -300,27 +297,15 @@ export default {
             room.showdialog = true;
             room.showdialogend = false;
             room.gamestart = false;
+            room.disablestartgame = true;
             this.$router.push('/homepage');
         },
         changePlayer: function () {
-
-            console.log(this.whitePlayer);
-            console.log(this.blackPlayer);
-            // let tmpname = room.blackplayername;
-            // let tmpid = room.blackplayerid;
-            // room.blackplayername = room.whiteplayername;
-            // room.blackplayerid = room.whiteplayerid;
-            // room.whiteplayerid = tmpid;
-            // room.whiteplayername = tmpname;
-            // if(room.currentcolor === 'white') room.currentcolor = 'black';
-            // else room.currentcolor = 'white'; 
             let tmp = room.blackplayer
             room.blackplayer = room.whiteplayer
             room.whiteplayer = tmp
-            // this.changePlayers = !this.changePlayers;
         },
         createGame: function () {
-            //todo 未满两人不得开始
             post("/api/chessBoard/" + room.userid + "/" + room.roomid,
                 { whitePlayerId: room.whiteplayer.id, blackPlayerId: room.blackplayer.id, boardSize: 19, timeToDrop: 60 },
                 () => { });
