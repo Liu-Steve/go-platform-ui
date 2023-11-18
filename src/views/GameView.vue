@@ -2,8 +2,8 @@
     <div style="width: 100vw;height:100vh;overflow:hidden;display: flex;background-color: antiquewhite;" ref="box">
         <!-- 左边棋盘 -->
         <div style="flex:1;">
-            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" @click="onVertexClick"
-                style="text-align: center;" />
+            <Goban :max-width="maxSize" :max-height="maxSize" :sign-map="signMap" :selected-map="selectedMap"
+                @click="onVertexClick" style="text-align: center;" />
         </div>
 
         <!-- 右边菜单 -->
@@ -49,18 +49,7 @@
             <el-row style="margin-top: 20px;">
                 <el-col>
                     <el-card class="card">
-                        <el-row>
-                            <!-- <el-col :span="8">
-                                <el-button type="warning" @click="">重置棋盘</el-button>
-                            </el-col> -->
-                            <el-col :span="8">
-                                <el-button type="warning"
-                                    @click="{ showDialog = true; console.log(blackPlayer) }">配置房间</el-button>
-                            </el-col>
-                            <!-- <el-col :span="8">
-                                <el-button type="warning" @click=" showDialogEnd = true">显示结束弹窗</el-button>
-                            </el-col> -->
-                        </el-row>
+
 
                         <el-row style="margin-top: 10px;">
                             <el-col :span="6">
@@ -72,10 +61,6 @@
                         </el-row>
 
                         <el-row style="margin-top: 10px;">
-                            <el-col :span="8">
-                                <el-button type="primary" @click="showDialog = true">开始新游戏</el-button>
-                            </el-col>
-
                             <el-col :span="6">
                                 <el-button type="danger" @click="exitRoom">退出房间</el-button>
                             </el-col>
@@ -140,37 +125,58 @@
     <!-- 游戏结束弹窗 -->
     <el-dialog title="游戏结束" v-model="showDialogEnd" width="30%" :close-on-click-modal="false" :close-on-press-escape="false"
         :show-close="false" :before-close="resetData()">
-        <div style="text-align: center;">
-            <div>
-                <el-row>
-                    <el-col>
-                        <el-text style="font-size: large;">{{ Winner }}</el-text>
-                    </el-col>
-                </el-row>
+
+        <!-- 认输时显示 -->
+        <div v-show=!isNotSurrender>
+            <el-row>
+                <el-col style="text-align: center;">
+                    <el-text style="font-size: large;">{{ Winner }}</el-text>
+                </el-col>
+            </el-row>
+        </div>
+
+        <!-- 正常结束时显示 -->
+        <div v-show=isNotSurrender>
+            <div style="text-align: center;" v-show="waitForResult">
+                <el-text size="large">
+                    等待结果中……
+                </el-text>
             </div>
-            <div v-show=isNotSurrender>
-                <el-row>
-                    <el-col>
-                        <el-text>
-                            <img :src="blackStone" class="stone">
-                            <span style="font-size: large;">{{ " " + blackPlayer.name }}：</span>
-                            <span style="font-size: large;">{{ " " + blackCount + "目" }}</span>
-                        </el-text>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-text>
-                            <img :src="whiteStone" class="stone">
-                            <span style="font-size: large;">{{ " " + whitePlayer.name }}：</span>
-                            <span style="font-size: large;">{{ " " + whiteCount + "目" }}</span>
-                        </el-text>
-                    </el-col>
-                </el-row>
+
+            <div style="text-align: center;" v-show="!waitForResult">
+                <div>
+                    <el-row>
+                        <el-col style="text-align: center;">
+                            <el-text style="font-size: large;">{{ Winner }}</el-text>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col>
+                            <el-text>
+                                <img :src="blackStone" class="stone">
+                                <span style="font-size: large;">{{ " " + blackPlayer.name }}：</span>
+                                <span style="font-size: large;">{{ " " + blackCount + "目" }}</span>
+                            </el-text>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col>
+                            <el-text>
+                                <img :src="whiteStone" class="stone">
+                                <span style="font-size: large;">{{ " " + whitePlayer.name }}：</span>
+                                <span style="font-size: large;">{{ " " + whiteCount + "目" }}</span>
+                            </el-text>
+                        </el-col>
+                    </el-row>
+                </div>
             </div>
         </div>
-        <div slot="footer" class="dialog-footer" style="text-align: right;">
-            <el-button type="success" @click="{ showDialogEnd = false; showDialog = true }" v-show=isOwner>开始新游戏</el-button>
+
+        <div slot="footer" class="dialog-footer" style="text-align: right;margin-top: 20px;" v-show="!waitForResult">
+            <el-button type="success" @click="{ showDialogEnd = false; showDialog = true }"
+                v-show="isOwner">开始新游戏</el-button>
+            <el-button type="success" @click="{ showDialogEnd = false; showDialog = true }"
+                v-show="!isOwner">等待下一局</el-button>
             <el-button type="danger" @click="exitRoom">退出房间</el-button>
         </div>
     </el-dialog>
@@ -220,11 +226,14 @@ export default {
             Winner: storeToRefs(room).winner,
             whiteCount: storeToRefs(room).whitecount,
             blackCount: storeToRefs(room).blackcount,
+            selectedMap: storeToRefs(room).selectedmap,
 
             showDialog: storeToRefs(room).showdialog,
             showDialogEnd: storeToRefs(room).showdialogend,
             isNotSurrender: storeToRefs(room).isnotsurrender,
             disableStartGame: storeToRefs(room).disablestartgame,
+            waitForResult: storeToRefs(room).waitforresult,
+
         };
     },
 
@@ -324,11 +333,12 @@ export default {
             }
         },
         surrender: function () {
+            room.winner = "你选择投降"
             room.gamestart = false;
             room.showdialogend = true;
             room.isnotsurrender = false;
-            room.winner = "你选择投降！"
-        }
+            get("/api/chessBoard/over_request/" + room.userid + '/' + room.roomid, () => { })
+        },
     },
 
     computed: {

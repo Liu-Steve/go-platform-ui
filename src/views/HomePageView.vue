@@ -189,6 +189,7 @@ const createAIRoom = () => {
             room.roomowner.id = message.result.createUserId;
             room.isowner = true;
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
+            room.gamestart = false;
             // room.roomplayer.name = ''
             // room.roomplayer.id = ''
             // room.blackplayerid = room.roomowner.id;
@@ -198,7 +199,8 @@ const createAIRoom = () => {
                 type: 'success'
             })
 
-            room.roomplayer = {id: -1, name: '电脑玩家'}
+            room.roomplayer = { id: -1, name: '电脑玩家' }
+            room.disablestartgame = false;
 
             router.push('/game');
         })
@@ -214,6 +216,7 @@ const joinRoom = (userid, roomid) => {
             room.roomplayer.id = room.userid
             room.isowner = false;
             room.jsonchessboard = ref(JSON.parse(JSON.stringify(Array(19 * 19).fill(0))));
+            room.gamestart = false;
             router.push("/game");
         })
 }

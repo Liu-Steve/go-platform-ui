@@ -28,20 +28,23 @@ export const useRoomStore = defineStore('room', () => {
 	const gamestart = ref(false)
 	const showdialog = ref(true)
 	const isowner = ref(false)
-	const playerisblack = ref(false)
+	const playerisblack = ref(true)
 	const isdrop = ref(true)
 	const disablestartgame = ref(true)
+	const selectedmap = ref(Array(19 * 19).fill(false));
 
 	//对局结束信息
 	const winner = ref('')
 	const whitecount = ref(0)
 	const blackcount = ref(0)
 	const showdialogend = ref(false)
+	const waitforresult = ref(false)
 	const isnotsurrender = ref(true)
 
 	return {
 		userid, username, ws_state,
-		roomid, chessboard, jsonchessboard, roomplayer, roomowner, blackplayer, whiteplayer, gamestart, isowner, showdialog, playerisblack, isdrop, disablestartgame,
-		winner, whitecount, blackcount, showdialogend, isnotsurrender
+		roomid, chessboard, jsonchessboard, roomplayer, roomowner, blackplayer, whiteplayer,
+		gamestart, isowner, showdialog, playerisblack, isdrop, disablestartgame, selectedmap,
+		winner, whitecount, blackcount, showdialogend, waitforresult, isnotsurrender
 	}
 })

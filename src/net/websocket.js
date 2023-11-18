@@ -91,10 +91,18 @@ function ws_event(ws, url) {
                 case 0://CHESS_WAIT
                     room.chessboard = Cboard;
                     room.playerisblack = !room.playerisblack;
+                    if (room.gamestart) {
+                        room.selectedmap = Array(19 * 19).fill(false);
+                        room.selectedmap[data.message.lastPos[0] * 19 + data.message.lastPos[1]] = true;
+                    }
+                    // console.log(room.gamestart);
                     //当前方执白
                     if (!room.gamestart) {
                         room.gamestart = true;
                         room.showdialog = false;
+                        room.playerisblack = true;
+                        room.isnotsurrender = true;
+                        room.showdialogend = false;
                         if (room.blackplayer.id === room.userid) {
                             let tmp = room.whiteplayer;
                             room.whiteplayer = room.blackplayer;
@@ -103,13 +111,21 @@ function ws_event(ws, url) {
                     }
                     break;
                 case 1://CHESS_START
+
                     room.chessboard = Cboard;
                     room.playerisblack = !room.playerisblack;
                     room.isdrop = true;
+                    if (room.gamestart) {
+                        room.selectedmap = Array(19 * 19).fill(false);
+                        room.selectedmap[data.message.lastPos[0] * 19 + data.message.lastPos[1]] = true;
+                    }
                     //当前方执黑
                     if (!room.gamestart) {
                         room.gamestart = true;
                         room.showdialog = false;
+                        room.playerisblack = true;
+                        room.isnotsurrender = true;
+                        room.showdialogend = false;
                         if (room.whiteplayer.id === room.userid) {
                             let tmp = room.blackplayer;
                             room.blackplayer = room.whiteplayer;
@@ -150,29 +166,22 @@ function ws_event(ws, url) {
                         room.isnotsurrender = false;
                         room.winner = "对方投降，你赢了！"
                     }
+                    room.waitforresult = false;
+                    break;
+                case 6://等待结果
+                    room.showdialogend = true;
+                    room.waitforresult = true;
                     break;
                 case 10://ROOM_ENTER
                     room.roomowner.id = data.message.createUserId
                     room.roomowner.name = data.message.createUserName;
                     room.roomplayer.id = data.message.secondUserId;
                     room.disablestartgame = false;
+                    room.gamestart = false;
 
-                    if (room.roomplayer.id === -1) {
-                        room.roomplayer.name = "电脑玩家";
-                    }
-                    else {
-                        get("/api/user/" + room.roomplayer.id,
-                            (message) => { room.roomplayer.name = message.result.username })
-                    }
+                    get("/api/user/" + room.roomplayer.id,
+                        (message) => { room.roomplayer.name = message.result.username })
 
-                    // if(room.currentcolor === 'white') {
-                    //     room.blackplayername = room.roomplayer.name;
-                    //     room.blackplayerid = room.roomplayer.id;
-                    // }
-                    // else {
-                    //     room.whiteplayername = room.roomplayer.name;
-                    //     room.whiteplayerid = room.roomplayer.id;
-                    // }
                     break;
                 case 11://ROOM_EXIT;
                     room.roomplayer.id = "";
@@ -182,6 +191,7 @@ function ws_event(ws, url) {
                     room.isowner = true;
                     room.showdialog = true;
                     room.disablestartgame = true;
+                    room.gamestart = false;
                     break;
             }
             // callBack(roomowner, user2, chessboard);
