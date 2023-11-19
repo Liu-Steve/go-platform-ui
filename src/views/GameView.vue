@@ -279,7 +279,7 @@ export default {
 
     methods: {
         onVertexClick: function (offset) {
-            if (room.isdrop) {
+            if (room.gamestart && room.isdrop) {
                 if (room.chessboard[offset] === 0) {
                     room.isdrop = false;
 
@@ -338,19 +338,23 @@ export default {
             this.whitePlayer = storeToRefs(room).whiteplayer;
         },
         waitOneStep: function () {
-            if (room.isdrop) {
-                room.isdrop = false;
-                room.playerisblack = !room.playerisblack;
-                get("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, () => { });
+            if (room.gamestart) {
+                if (room.isdrop) {
+                    room.isdrop = false;
+                    room.playerisblack = !room.playerisblack;
+                    get("/api/chessBoard/stop_once/" + room.userid + "/" + room.roomid, () => { });
+                }
             }
         },
         surrender: function () {
-            room.winner = "你选择投降"
-            room.gamestart = false;
-            room.showdialogend = true;
-            room.isnotsurrender = false;
-            room.selectedmap = Array(19 * 19).fill(false);
-            get("/api/chessBoard/over_request/" + room.userid + '/' + room.roomid, () => { })
+            if (room.gamestart) {
+                room.winner = "你选择投降"
+                room.gamestart = false;
+                room.showdialogend = true;
+                room.isnotsurrender = false;
+                room.selectedmap = Array(19 * 19).fill(false);
+                get("/api/chessBoard/over_request/" + room.userid + '/' + room.roomid, () => { })
+            }
         },
     },
 
